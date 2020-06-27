@@ -8,7 +8,8 @@ defmodule Exchanger.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      {Exchanger.ExchangeRate.Updater, [currencies: ["USD", "CAD", "GBP"]]},
+      {Exchanger.ExchangeRate.Updater, ["USD", "CAD", "GBP"]},
+      {Exchanger.ExchangeRate.Store, []},
       # Start the Ecto repository
       Exchanger.Repo,
       # Start the endpoint when the application starts

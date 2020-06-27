@@ -1,7 +1,6 @@
 defmodule Exchanger.ExchangeRate.Updater do
   use GenServer
-
-  alias Exchanger.ExchangeRate.Api
+  alias Exchanger.ExchangeRate.{Api, Store}
 
   # 250 ms
   @refresh_time 1000
@@ -12,10 +11,9 @@ defmodule Exchanger.ExchangeRate.Updater do
     GenServer.start_link(__MODULE__, default)
   end
 
-  def init(opts) do
-    currencies = Keyword.fetch!(opts, :currencies)
+  def init(currencies) do
     tick()
-    {:ok, %{currencies: currencies, rates: %{}}}
+    {:ok, %{currencies: currencies}}
   end
 
   def handle_info(:tick, state) do
@@ -29,11 +27,13 @@ defmodule Exchanger.ExchangeRate.Updater do
     Process.send_after(self(), :tick, @refresh_time)
   end
 
-  defp update_rates(%{currencies: currencies, rates: rates} = state) do
+  defp update_rates(%{currencies: currencies} = state) do
     {base, list} = List.pop_at(currencies, -1)
 
     case Api.get(base, list) do
-      {:ok, rate} -> %{currencies: [base | list], rates: Map.merge(rates, rate)}
+      {:ok, rate} ->
+        Store.update(rate)
+        %{currencies: [base | list]}
       :error -> state
     end
   end

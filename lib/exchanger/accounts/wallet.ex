@@ -1,4 +1,7 @@
 defmodule Exchanger.Accounts.Wallet do
+  @moduledoc """
+  An immutable container that holds transactions of a single currency
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Exchanger.Accounts.User

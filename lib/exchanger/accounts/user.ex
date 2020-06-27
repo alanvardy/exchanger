@@ -1,7 +1,11 @@
 defmodule Exchanger.Accounts.User do
+  @moduledoc """
+  A record of a person with multiple wallets holding
+  multiple transactions
+  """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Exchange.Accounts.Wallet
+  alias Exchanger.Accounts.Wallet
 
   schema "users" do
     field :first_name, :string

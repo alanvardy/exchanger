@@ -5,7 +5,9 @@ defmodule ExchangerWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", ExchangerWeb do
+  scope "/" do
     pipe_through :api
+
+    forward "/api", Absinthe.Plug, schema: ExchangerWeb.Schema
   end
 end

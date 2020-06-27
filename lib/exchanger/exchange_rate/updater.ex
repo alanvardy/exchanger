@@ -1,4 +1,5 @@
 defmodule Exchanger.ExchangeRate.Updater do
+  @moduledoc "Periodically polls the exchange rate API and updates Store"
   use GenServer
   alias Exchanger.ExchangeRate.{Api, Store}
 
@@ -34,7 +35,9 @@ defmodule Exchanger.ExchangeRate.Updater do
       {:ok, rate} ->
         Store.update(rate)
         %{currencies: [base | list]}
-      :error -> state
+
+      :error ->
+        state
     end
   end
 end

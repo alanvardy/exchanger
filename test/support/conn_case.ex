@@ -14,7 +14,7 @@ defmodule ExchangerWeb.ConnCase do
   """
 
   use ExUnit.CaseTemplate
-    alias Ecto.Adapters.SQL.Sandbox
+  alias Ecto.Adapters.SQL.Sandbox
   alias Exchanger.Repo
 
   using do

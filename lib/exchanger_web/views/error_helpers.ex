@@ -3,6 +3,7 @@ defmodule ExchangerWeb.ErrorHelpers do
   Conveniences for translating and building error messages.
   """
 
+  @spec translate_error({binary, keyword | map}) :: binary
   @doc """
   Translates an error message using gettext.
   """

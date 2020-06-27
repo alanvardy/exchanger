@@ -6,17 +6,20 @@ defmodule Exchanger.ExchangeRate.Updater do
   # 250 ms
   @refresh_time 1000
 
-  @impl true
-
+  @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(default) when is_list(default) do
     GenServer.start_link(__MODULE__, default)
   end
 
+  @impl true
+  @spec init(any) :: {:ok, %{currencies: [map]}}
   def init(currencies) do
     tick()
     {:ok, %{currencies: currencies}}
   end
 
+  @impl true
+  @spec handle_info(:tick, map) :: {:noreply, map}
   def handle_info(:tick, state) do
     state = update_rates(state)
 
@@ -31,7 +34,7 @@ defmodule Exchanger.ExchangeRate.Updater do
   defp update_rates(%{currencies: currencies} = state) do
     {base, list} = List.pop_at(currencies, -1)
 
-    case Api.get(base, list) do
+    case Api.get_rates(base, list) do
       {:ok, rate} ->
         Store.update(rate)
         %{currencies: [base | list]}

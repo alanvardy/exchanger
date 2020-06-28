@@ -145,56 +145,58 @@ defmodule Exchanger.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_wallet(attrs \\ %{}) do
-    %Wallet{}
-    |> Wallet.changeset(attrs)
+  def create_wallet(attrs) do
+    attrs
+    |> Wallet.create_changeset()
     |> Repo.insert()
   end
 
+  alias Exchanger.Accounts.Transaction
+
   @doc """
-  Updates a wallet.
+  Returns the list of transactions.
 
   ## Examples
 
-      iex> update_wallet(wallet, %{field: new_value})
-      {:ok, %Wallet{}}
-
-      iex> update_wallet(wallet, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+      iex> list_transactions()
+      [%Transaction{}, ...]
 
   """
-  def update_wallet(%Wallet{} = wallet, attrs) do
-    wallet
-    |> Wallet.changeset(attrs)
-    |> Repo.update()
+  def list_transactions do
+    Repo.all(Transaction)
   end
 
   @doc """
-  Deletes a wallet.
+  Gets a single transaction.
+
+  Raises `Ecto.NoResultsError` if the Transaction does not exist.
 
   ## Examples
 
-      iex> delete_wallet(wallet)
-      {:ok, %Wallet{}}
+      iex> get_transaction!(123)
+      %Transaction{}
 
-      iex> delete_wallet(wallet)
+      iex> get_transaction!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_transaction!(id), do: Repo.get!(Transaction, id)
+
+  @doc """
+  Creates a transaction.
+
+  ## Examples
+
+      iex> create_transaction(%{field: value})
+      {:ok, %Transaction{}}
+
+      iex> create_transaction(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_wallet(%Wallet{} = wallet) do
-    Repo.delete(wallet)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking wallet changes.
-
-  ## Examples
-
-      iex> change_wallet(wallet)
-      %Ecto.Changeset{data: %Wallet{}}
-
-  """
-  def change_wallet(%Wallet{} = wallet, attrs \\ %{}) do
-    Wallet.changeset(wallet, attrs)
+  def create_transaction(attrs) do
+    attrs
+    |> Transaction.create_changeset()
+    |> Repo.insert()
   end
 end

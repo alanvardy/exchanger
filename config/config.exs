@@ -15,7 +15,7 @@ config :exchanger, ExchangerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "CtrpXxypFbQ2WUVEG/xw/vDRWwW9qLz0sKRxi6BYXf3LNyfoi4G8PPqWlWnWh31s",
   render_errors: [view: ExchangerWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Exchanger.PubSub, adapter: Phoenix.PubSub.PG2]
+   pubsub_server: Exchanger.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

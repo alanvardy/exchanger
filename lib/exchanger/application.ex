@@ -11,6 +11,7 @@ defmodule Exchanger.Application do
     children = [
       {Exchanger.ExchangeRate.Updater, ["USD", "CAD", "GBP"]},
       {Exchanger.ExchangeRate.Store, []},
+      {Phoenix.PubSub, [name: Exchanger.PubSub, adapter: Phoenix.PubSub.PG2]},
       # Start the Ecto repository
       Exchanger.Repo,
       # Start the endpoint when the application starts

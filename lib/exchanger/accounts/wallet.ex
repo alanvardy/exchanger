@@ -4,20 +4,23 @@ defmodule Exchanger.Accounts.Wallet do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Exchanger.Accounts.User
+  alias Exchanger.Accounts.{Transaction, User}
 
   @required_attributes [:currency, :user_id]
 
   schema "wallets" do
     field :currency, :string
     belongs_to :user, User
+    has_many :sent_transactions, Transaction, foreign_key: :from_wallet_id
+    has_many :received_transactions, Transaction, foreign_key: :to_wallet_id
 
     timestamps()
   end
 
+  @spec create_changeset(map) :: Ecto.Changeset.t()
   @doc false
-  def changeset(wallet, attrs) do
-    wallet
+  def create_changeset(attrs) do
+    %__MODULE__{}
     |> cast(attrs, @required_attributes)
     |> validate_required(@required_attributes)
   end

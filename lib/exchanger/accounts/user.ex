@@ -5,16 +5,19 @@ defmodule Exchanger.Accounts.User do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Exchanger.Accounts.Wallet
+  alias Exchanger.Accounts.{Transaction, Wallet}
 
   schema "users" do
     field :first_name, :string
     field :last_name, :string
     has_many :wallets, Wallet
+    has_many :sent_transactions, Transaction, foreign_key: :from_user_id
+    has_many :received_transactions, Transaction, foreign_key: :to_user_id
 
     timestamps()
   end
 
+  # @spec changeset(t, map) :: Ecto.Changeset.t()
   @doc false
   def changeset(user, attrs) do
     user

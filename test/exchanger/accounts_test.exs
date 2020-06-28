@@ -67,13 +67,16 @@ defmodule Exchanger.AccountsTest do
   describe "wallets" do
     alias Exchanger.Accounts.Wallet
 
-    @valid_attrs %{currency: "some currency"}
-    @update_attrs %{currency: "some updated currency"}
+    @valid_attrs %{currency: "some currency", user_id: 1}
+    @update_attrs %{currency: "some updated currency", user_id: 2}
     @invalid_attrs %{currency: nil}
 
     def wallet_fixture(attrs \\ %{}) do
+      user_id = Enum.random(1..1000)
+
       {:ok, wallet} =
         attrs
+        |> Map.merge(%{user_id: user_id})
         |> Enum.into(@valid_attrs)
         |> Accounts.create_wallet()
 
@@ -98,28 +101,75 @@ defmodule Exchanger.AccountsTest do
     test "create_wallet/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_wallet(@invalid_attrs)
     end
+  end
 
-    test "update_wallet/2 with valid data updates the wallet" do
-      wallet = wallet_fixture()
-      assert {:ok, %Wallet{} = wallet} = Accounts.update_wallet(wallet, @update_attrs)
-      assert wallet.currency == "some updated currency"
+  describe "transactions" do
+    alias Exchanger.Accounts.Transaction
+
+    @valid_attrs %{
+      exchange_rate: 120.5,
+      from_amount: 42,
+      from_currency: "some from_currency",
+      to_amount: 42,
+      to_currency: "some to_currency",
+      from_user_id: 1,
+      to_user_id: 2,
+      from_wallet_id: 3,
+      to_wallet_id: 4
+    }
+    @update_attrs %{
+      exchange_rate: 456.7,
+      from_amount: 43,
+      from_currency: "some updated from_currency",
+      to_amount: 43,
+      to_currency: "some updated to_currency"
+    }
+    @invalid_attrs %{
+      exchange_rate: nil,
+      from_amount: nil,
+      from_currency: nil,
+      to_amount: nil,
+      to_currency: nil
+    }
+
+    def transaction_fixture(attrs \\ %{}) do
+      ids = %{
+        from_user_id: Enum.random(1..1000),
+        to_user_id: Enum.random(1..1000),
+        from_wallet_id: Enum.random(1..1000),
+        to_wallet_id: Enum.random(1..1000)
+      }
+
+      {:ok, transaction} =
+        attrs
+        |> Map.merge(ids)
+        |> Enum.into(@valid_attrs)
+        |> Accounts.create_transaction()
+
+      transaction
     end
 
-    test "update_wallet/2 with invalid data returns error changeset" do
-      wallet = wallet_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_wallet(wallet, @invalid_attrs)
-      assert wallet == Accounts.get_wallet!(wallet.id)
+    test "list_transactions/0 returns all transactions" do
+      transaction = transaction_fixture()
+      assert Accounts.list_transactions() == [transaction]
     end
 
-    test "delete_wallet/1 deletes the wallet" do
-      wallet = wallet_fixture()
-      assert {:ok, %Wallet{}} = Accounts.delete_wallet(wallet)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_wallet!(wallet.id) end
+    test "get_transaction!/1 returns the transaction with given id" do
+      transaction = transaction_fixture()
+      assert Accounts.get_transaction!(transaction.id) == transaction
     end
 
-    test "change_wallet/1 returns a wallet changeset" do
-      wallet = wallet_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_wallet(wallet)
+    test "create_transaction/1 with valid data creates a transaction" do
+      assert {:ok, %Transaction{} = transaction} = Accounts.create_transaction(@valid_attrs)
+      assert transaction.exchange_rate == 120.5
+      assert transaction.from_amount == 42
+      assert transaction.from_currency == "some from_currency"
+      assert transaction.to_amount == 42
+      assert transaction.to_currency == "some to_currency"
+    end
+
+    test "create_transaction/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_transaction(@invalid_attrs)
     end
   end
 end

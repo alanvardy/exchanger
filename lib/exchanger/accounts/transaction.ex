@@ -1,6 +1,6 @@
 defmodule Exchanger.Accounts.Transaction do
   @moduledoc "An immutable record of financial transfers between wallets"
-  use Ecto.Schema
+  use TypedEctoSchema
   import Ecto.Changeset
   alias Exchanger.Accounts.{User, Wallet}
 
@@ -8,16 +8,16 @@ defmodule Exchanger.Accounts.Transaction do
                          [:from_user_id, :to_user_id, :from_wallet_id, :to_wallet_id]
   @currencies Application.get_env(:exchanger, :currencies)
 
-  schema "transactions" do
+  typed_schema "transactions" do
     belongs_to :from_user, User
     belongs_to :from_wallet, Wallet
     belongs_to :to_user, User
     belongs_to :to_wallet, Wallet
-    field :from_amount, :integer
-    field :from_currency, :string
-    field :to_amount, :integer
-    field :to_currency, :string
-    field :exchange_rate, :float
+    field :from_amount, :integer, null: false
+    field :from_currency, :string, null: false
+    field :to_amount, :integer, null: false
+    field :to_currency, :string, null: false
+    field :exchange_rate, :float, null: false
 
     timestamps()
   end

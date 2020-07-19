@@ -7,6 +7,7 @@ defmodule Exchanger.Factory do
 
   @currencies Application.get_env(:exchanger, :currencies)
 
+  @spec transaction_factory :: Transaction.t()
   def transaction_factory do
     from_user = insert(:user)
     to_user = insert(:user)
@@ -24,6 +25,7 @@ defmodule Exchanger.Factory do
     }
   end
 
+  @spec user_factory :: User.t()
   def user_factory do
     %User{
       first_name: sequence(:first_name, &"Jane#{&1}"),
@@ -31,6 +33,7 @@ defmodule Exchanger.Factory do
     }
   end
 
+  @spec wallet_factory :: Wallet.t()
   def wallet_factory do
     %Wallet{
       currency: currency(),

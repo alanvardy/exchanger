@@ -6,6 +6,7 @@ defmodule Exchanger.Accounts.Transaction do
 
   @required_attributes [:from_amount, :from_currency, :to_amount, :to_currency, :exchange_rate] ++
                          [:from_user_id, :to_user_id, :from_wallet_id, :to_wallet_id]
+  @currencies Application.get_env(:exchanger, :currencies)
 
   schema "transactions" do
     belongs_to :from_user, User
@@ -27,5 +28,11 @@ defmodule Exchanger.Accounts.Transaction do
     %__MODULE__{}
     |> cast(attrs, @required_attributes)
     |> validate_required(@required_attributes)
+    |> validate_inclusion(:from_currency, @currencies)
+    |> validate_inclusion(:to_currency, @currencies)
+    # validate that exchange rate is 1 when currencies are the same
+    # Validate minimum $5 transfer
+    # Validate maximum $1 million transfer.
+    # Adjust amounts per currency
   end
 end

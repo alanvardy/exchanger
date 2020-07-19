@@ -24,6 +24,8 @@ defmodule Exchanger.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Exchanger.DataCase
+      import Exchanger.Factory
+      import Exchanger.Helpers
     end
   end
 

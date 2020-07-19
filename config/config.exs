@@ -8,14 +8,15 @@
 use Mix.Config
 
 config :exchanger,
-  ecto_repos: [Exchanger.Repo]
+  ecto_repos: [Exchanger.Repo],
+  currencies: ["USD", "CAD", "GBP"]
 
 # Configures the endpoint
 config :exchanger, ExchangerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "CtrpXxypFbQ2WUVEG/xw/vDRWwW9qLz0sKRxi6BYXf3LNyfoi4G8PPqWlWnWh31s",
   render_errors: [view: ExchangerWeb.ErrorView, accepts: ~w(json)],
-   pubsub_server: Exchanger.PubSub
+  pubsub_server: Exchanger.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

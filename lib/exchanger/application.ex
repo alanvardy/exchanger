@@ -6,10 +6,12 @@ defmodule Exchanger.Application do
   use Application
 
   @spec start(any, any) :: {:error, any} | {:ok, pid}
+  @currencies Application.get_env(:exchanger, :currencies)
+  
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      {Exchanger.ExchangeRate.Updater, ["USD", "CAD", "GBP"]},
+      {Exchanger.ExchangeRate.Updater, @currencies},
       {Exchanger.ExchangeRate.Store, []},
       {Phoenix.PubSub, [name: Exchanger.PubSub, adapter: Phoenix.PubSub.PG2]},
       # Start the Ecto repository

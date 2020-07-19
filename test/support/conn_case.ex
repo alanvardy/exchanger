@@ -20,8 +20,11 @@ defmodule ExchangerWeb.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      use Phoenix.ConnTest
-      alias ExchangerWeb.Router.Helpers, as: Routes
+      import Plug.Conn
+    import Phoenix.ConnTest
+    import Exchanger.Factory
+    import Exchanger.Helpers
+    alias ExchangerWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
       @endpoint ExchangerWeb.Endpoint

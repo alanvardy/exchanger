@@ -7,7 +7,7 @@ defmodule Exchanger.Application do
 
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   @currencies Application.get_env(:exchanger, :currencies)
-  
+
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [

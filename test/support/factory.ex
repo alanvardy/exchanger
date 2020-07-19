@@ -1,7 +1,8 @@
 defmodule Exchanger.Factory do
-  # with Ecto
+  @moduledoc """
+    ExMachina fixtures for test cases.
+  """
   use ExMachina.Ecto, repo: Exchanger.Repo
-
   alias Exchanger.Accounts.{Transaction, User, Wallet}
 
   @currencies Application.get_env(:exchanger, :currencies)
@@ -9,6 +10,7 @@ defmodule Exchanger.Factory do
   def transaction_factory do
     from_user = insert(:user)
     to_user = insert(:user)
+
     %Transaction{
       from_user: from_user,
       from_wallet: build(:wallet, user: from_user),
@@ -38,5 +40,5 @@ defmodule Exchanger.Factory do
 
   defp currency, do: Enum.random(@currencies)
   defp pos_integer, do: Enum.random(500..100_000_000)
-  defp float(a, b), do: a + :rand.uniform() * (b-a)
+  defp float(a, b), do: a + :rand.uniform() * (b - a)
 end

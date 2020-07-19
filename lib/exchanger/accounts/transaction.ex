@@ -30,6 +30,7 @@ defmodule Exchanger.Accounts.Transaction do
     |> validate_required(@required_attributes)
     |> validate_inclusion(:from_currency, @currencies)
     |> validate_inclusion(:to_currency, @currencies)
+
     # validate that exchange rate is 1 when currencies are the same
     # Validate minimum $5 transfer
     # Validate maximum $1 million transfer.

@@ -7,6 +7,7 @@ defmodule Exchanger.Accounts.Wallet do
   alias Exchanger.Accounts.{Transaction, User}
 
   @required_attributes [:currency, :user_id]
+  @currencies Application.get_env(:exchanger, :currencies)
 
   schema "wallets" do
     field :currency, :string
@@ -23,5 +24,6 @@ defmodule Exchanger.Accounts.Wallet do
     %__MODULE__{}
     |> cast(attrs, @required_attributes)
     |> validate_required(@required_attributes)
+    |> validate_inclusion(:currency, @currencies)
   end
 end

@@ -24,7 +24,8 @@ defmodule Exchanger.AccountsTest do
     end
 
     test "create_user/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(params_for(:user, first_name: nil))
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_user(params_for(:user, first_name: nil))
     end
 
     test "update_user/2 with valid data updates the user" do
@@ -75,7 +76,8 @@ defmodule Exchanger.AccountsTest do
     end
 
     test "create_wallet/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_wallet(params_for(:wallet, currency: nil))
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_wallet(params_for(:wallet, currency: nil))
     end
   end
 
@@ -95,13 +97,22 @@ defmodule Exchanger.AccountsTest do
     test "create_transaction/1 with valid data creates a transaction" do
       from_wallet = insert(:wallet)
       to_wallet = insert(:wallet)
-      params = params_for(:transaction, from_wallet: from_wallet, from_user: from_wallet.user, to_wallet: to_wallet, to_user: to_wallet.user)
+
+      params =
+        params_for(:transaction,
+          from_wallet: from_wallet,
+          from_user: from_wallet.user,
+          to_wallet: to_wallet,
+          to_user: to_wallet.user
+        )
+
       assert {:ok, %Transaction{} = transaction} = Accounts.create_transaction(params)
       assert_comparable(params, transaction)
     end
 
     test "create_transaction/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_transaction(params_for(:transaction, from_currency: nil))
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_transaction(params_for(:transaction, from_currency: nil))
     end
   end
 end

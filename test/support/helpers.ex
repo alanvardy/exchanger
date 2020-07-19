@@ -1,4 +1,7 @@
 defmodule Exchanger.Helpers do
+  @moduledoc """
+  Test helpers, imported into all test files
+  """
   import ExUnit.Assertions
 
   @doc """

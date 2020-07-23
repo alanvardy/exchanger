@@ -2,9 +2,10 @@ defmodule Exchanger.ExchangeRate.Updater do
   @moduledoc "Periodically polls the exchange rate API and updates Store"
   use GenServer
   alias Exchanger.ExchangeRate.{Api, Store}
+  require Logger
 
-  # 250 ms
-  @refresh_time 1000
+  @time_between_rounds 1000
+  @time_between_requests 1000
 
   @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(default) when is_list(default) do
@@ -15,32 +16,31 @@ defmodule Exchanger.ExchangeRate.Updater do
   @spec init(any) :: {:ok, %{currencies: [map]}}
   def init(currencies) do
     tick()
-    {:ok, %{currencies: currencies}}
+
+    {:ok, currencies}
   end
 
   @impl true
   @spec handle_info(:tick, map) :: {:noreply, map}
-  def handle_info(:tick, state) do
-    state = update_rates(state)
+  def handle_info(:tick, currencies) do
+    update_rates(currencies)
 
     tick()
-    {:noreply, state}
+    {:noreply, currencies}
   end
 
   defp tick do
-    Process.send_after(self(), :tick, @refresh_time)
+    Process.send_after(self(), :tick, @time_between_rounds)
   end
 
-  defp update_rates(%{currencies: currencies} = state) do
-    {base, list} = List.pop_at(currencies, -1)
+  defp update_rates(currencies) do
+    for from_currency <- currencies, to_currency <- currencies, from_currency != to_currency do
+      case Api.get_rate(from_currency, to_currency) do
+        {:ok, rate} -> Store.update(rate)
+        {:error, message} -> Logger.error("Could not get rate: #{message}")
+      end
 
-    case Api.get_rates(base, list) do
-      {:ok, rate} ->
-        Store.update(rate)
-        %{currencies: [base | list]}
-
-      :error ->
-        state
+      :timer.sleep(@time_between_requests)
     end
   end
 end

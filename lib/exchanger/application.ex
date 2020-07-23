@@ -12,7 +12,7 @@ defmodule Exchanger.Application do
     # List all child processes to be supervised
     children = [
       {Exchanger.ExchangeRate.Updater, @currencies},
-      {Exchanger.ExchangeRate.Store, []},
+      {Exchanger.ExchangeRate.Store, @currencies},
       {Phoenix.PubSub, [name: Exchanger.PubSub, adapter: Phoenix.PubSub.PG2]},
       # Start the Ecto repository
       Exchanger.Repo,

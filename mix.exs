@@ -46,6 +46,7 @@ defmodule Exchanger.MixProject do
       {:typed_ecto_schema, "~> 0.1.0"},
       {:absinthe, "~> 1.5.0"},
       {:absinthe_plug, "~> 1.5.0"},
+      {:timex, "~> 3.5"},
       {:ex_machina, "~> 2.4", only: :test},
       {:ex_check, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},

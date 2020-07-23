@@ -9,7 +9,8 @@ use Mix.Config
 
 config :exchanger,
   ecto_repos: [Exchanger.Repo],
-  currencies: ["USD", "CAD", "GBP"]
+  currencies: ["USD", "CAD", "GBP"],
+  api_client: Exchanger.ExchangeRate.Client.Http
 
 # Configures the endpoint
 config :exchanger, ExchangerWeb.Endpoint,

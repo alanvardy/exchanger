@@ -3,14 +3,15 @@ defmodule Exchanger.ExchangeRate.Store do
   use Agent
 
   @type currency :: String.t()
+  @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 
   @spec start_link(any) :: {:error, any} | {:ok, pid}
   def start_link(currencies) do
     Agent.start_link(fn -> build_rates_map(currencies) end, name: __MODULE__)
   end
 
-  @spec rate(currency, currency) :: {:error, :rate_not_found} | {:ok, map}
-  def rate(from, to) do
+  @spec fetch_rate(currency, currency) :: rate_response
+  def fetch_rate(from, to) do
     case Agent.get(__MODULE__, &get_in(&1, [from, to])) do
       %{rate: _, updated: _} = data -> {:ok, data}
       _ -> {:error, :rate_not_found}
@@ -24,7 +25,11 @@ defmodule Exchanger.ExchangeRate.Store do
 
   defp build_rates_map(currencies) do
     Enum.map(currencies, fn c ->
-      {c, Enum.map(currencies -- [c], fn cc -> {cc, nil} end) |> Enum.into(%{})}
+      {c,
+       Enum.map(currencies -- [c], fn cc ->
+         {cc, nil}
+       end)
+       |> Enum.into(%{})}
     end)
     |> Enum.into(%{})
   end

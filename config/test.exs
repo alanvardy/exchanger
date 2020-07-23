@@ -14,5 +14,9 @@ config :exchanger, ExchangerWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :exchanger,
+  currencies: ["USD", "CAD"],
+  api_client: Exchanger.ExchangeRate.Client.Local
+
 # Print only warnings and errors during test
 config :logger, level: :warn

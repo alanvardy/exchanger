@@ -1,11 +1,11 @@
 defmodule Exchanger.ExchangeRate.Updater do
   @moduledoc "Periodically polls the exchange rate API and updates Store"
   use GenServer
-  alias Exchanger.ExchangeRate.{Api, Store}
+  alias Exchanger.ExchangeRate.{Client, Store}
   require Logger
 
   @time_between_rounds 1000
-  @time_between_requests 1000
+  @time_between_requests 100
 
   @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(default) when is_list(default) do
@@ -35,7 +35,7 @@ defmodule Exchanger.ExchangeRate.Updater do
 
   defp update_rates(currencies) do
     for from_currency <- currencies, to_currency <- currencies, from_currency != to_currency do
-      case Api.get_rate(from_currency, to_currency) do
+      case Client.get_rate(from_currency, to_currency) do
         {:ok, rate} -> Store.update(rate)
         {:error, message} -> Logger.error("Could not get rate: #{message}")
       end

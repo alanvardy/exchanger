@@ -4,8 +4,8 @@ defmodule Exchanger.ExchangeRate.Updater do
   alias Exchanger.ExchangeRate.{Client, Store}
   require Logger
 
-  @time_between_rounds 1000
-  @time_between_requests 100
+  @time_between_requests Application.get_env(:exchanger, :currency_refresh)
+  @time_between_rounds @time_between_requests * 5
 
   @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(default) when is_list(default) do

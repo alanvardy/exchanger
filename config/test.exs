@@ -16,6 +16,7 @@ config :exchanger, ExchangerWeb.Endpoint,
 
 config :exchanger,
   currencies: ["USD", "CAD"],
+  currency_refresh: 20,
   api_client: Exchanger.ExchangeRate.Client.Local
 
 # Print only warnings and errors during test

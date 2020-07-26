@@ -6,12 +6,12 @@ defmodule Exchanger.AccountsTest do
 
   @currencies Application.get_env(:exchanger, :currencies)
 
-  def start_store(_context) do
+  setup_all do
     start_supervised({Exchanger.ExchangeRate.Store, @currencies})
     start_supervised({Exchanger.ExchangeRate.Updater, @currencies})
 
     # Give the Updater time to update Store
-    :timer.sleep(1000)
+    :timer.sleep(100)
     :ok
   end
 
@@ -106,8 +106,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "create_deposit/3" do
-    setup :start_store
-
     test "with valid data creates a transaction" do
       wallet = insert(:wallet)
       user_id = wallet.user_id
@@ -141,8 +139,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "create_transfer/3" do
-    setup :start_store
-
     test "with valid data creates a transaction" do
       from_user = insert(:user)
       from_user_id = from_user.id

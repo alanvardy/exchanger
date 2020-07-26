@@ -48,7 +48,7 @@ defmodule Exchanger.Accounts do
     Repo.all(Wallet)
   end
 
-  @spec get_wallet!(any) :: Wallet.t()
+  @spec get_wallet!(id) :: Wallet.t()
   def get_wallet!(id), do: Repo.get!(Wallet, id)
 
   @spec create_wallet(map) :: success_tuple(Wallet.t())
@@ -63,7 +63,7 @@ defmodule Exchanger.Accounts do
     Repo.all(Transaction)
   end
 
-  @spec get_transaction!(any) :: Transaction.t()
+  @spec get_transaction!(id) :: Transaction.t()
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
   @spec create_transaction(map) :: success_tuple(Transaction.t())

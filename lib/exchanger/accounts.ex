@@ -43,24 +43,30 @@ defmodule Exchanger.Accounts do
     User.changeset(user, attrs)
   end
 
+  @spec list_wallets :: [Wallet.t()]
   def list_wallets do
     Repo.all(Wallet)
   end
 
+  @spec get_wallet!(any) :: Wallet.t()
   def get_wallet!(id), do: Repo.get!(Wallet, id)
 
+  @spec create_wallet(map) :: success_tuple(Wallet.t())
   def create_wallet(attrs) do
     attrs
     |> Wallet.create_changeset()
     |> Repo.insert()
   end
 
+  @spec list_transactions :: [Transaction.t()]
   def list_transactions do
     Repo.all(Transaction)
   end
 
+  @spec get_transaction!(any) :: Transaction.t()
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
+  @spec create_transaction(map) :: success_tuple(Transaction.t())
   def create_transaction(attrs) do
     attrs
     |> Transaction.create_changeset()

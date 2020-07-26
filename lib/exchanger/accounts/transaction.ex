@@ -4,8 +4,8 @@ defmodule Exchanger.Accounts.Transaction do
   alias Exchanger.Accounts.{TransactionError, User, Wallet}
 
   @deposit_attrs [:to_amount, :to_currency, :to_user_id, :to_wallet_id, :type]
-  # @transfer_attrs [:from_amount, :from_currency, :to_amount, :to_currency, :exchange_rate] ++
-  #                   [:from_user_id, :to_user_id, :from_wallet_id, :to_wallet_id]
+  @transfer_attrs @deposit_attrs ++
+                    [:from_currency, :from_amount, :exchange_rate, :from_user_id, :from_wallet_id]
   @currencies Application.get_env(:exchanger, :currencies)
   @types ["deposit", "withdrawal", "transfer"]
 
@@ -60,29 +60,33 @@ defmodule Exchanger.Accounts.Transaction do
     raise TransactionError, reason: :wrong_currency, currency: currency, wallet_id: id
   end
 
-  # @spec create_transfer_changeset(wallet, wallet, amount, exchange_rate) :: changeset
-  # def create_transfer_changeset(from_wallet, to_wallet, amount, exchange_rate) do
-  #   %Wallet{id: from_wallet_id, user_id: from_user_id, currency: from_currency} = from_wallet
-  #   %Wallet{id: to_wallet_id, user_id: to_user_id, currency: to_currency} = to_wallet
+  @spec create_transfer_changeset(wallet, wallet, amount, exchange_rate) :: changeset
+  def create_transfer_changeset(%Wallet{id: id}, _, nil, _) do
+    raise TransactionError, reason: :invalid_amount, amount: nil, wallet_id: id
+  end
 
-  #   attrs = %{
-  #     type: "transfer",
-  #     from_user_id: from_user_id,
-  #     from_wallet_id: from_wallet_id,
-  #     to_user_id: to_user_id,
-  #     to_wallet_id: to_wallet_id,
-  #     from_amount: amount,
-  #     from_currency: from_currency,
-  #     to_currency: to_currency,
-  #     exchange_rate: exchange_rate,
-  #     to_amount: amount * exchange_rate
-  #   }
+  def create_transfer_changeset(from_wallet, to_wallet, amount, exchange_rate) do
+    %Wallet{id: from_wallet_id, user_id: from_user_id, currency: from_currency} = from_wallet
+    %Wallet{id: to_wallet_id, user_id: to_user_id, currency: to_currency} = to_wallet
 
-  #   %__MODULE__{}
-  #   |> cast(attrs, @transfer_attrs)
-  #   |> validate_required(@transfer_attrs)
-  #   |> validate_inclusion(:from_currency, @currencies)
-  #   |> validate_inclusion(:to_currency, @currencies)
-  #   |> validate_inclusion(:type, @types)
-  # end
+    attrs = %{
+      type: "transfer",
+      from_user_id: from_user_id,
+      from_wallet_id: from_wallet_id,
+      to_user_id: to_user_id,
+      to_wallet_id: to_wallet_id,
+      from_amount: amount,
+      from_currency: from_currency,
+      to_currency: to_currency,
+      exchange_rate: exchange_rate,
+      to_amount: trunc(amount * exchange_rate)
+    }
+
+    %__MODULE__{}
+    |> cast(attrs, @transfer_attrs)
+    |> validate_required(@transfer_attrs)
+    |> validate_inclusion(:from_currency, @currencies)
+    |> validate_inclusion(:to_currency, @currencies)
+    |> validate_inclusion(:type, @types)
+  end
 end

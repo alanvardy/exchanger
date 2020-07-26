@@ -4,6 +4,17 @@ defmodule Exchanger.AccountsTest do
   alias Exchanger.Accounts
   alias Exchanger.Accounts.{Transaction, TransactionError, User, Wallet}
 
+  @currencies Application.get_env(:exchanger, :currencies)
+
+  def start_store(_context) do
+    start_supervised({Exchanger.ExchangeRate.Store, @currencies})
+    start_supervised({Exchanger.ExchangeRate.Updater, @currencies})
+
+    # Give the Updater time to update Store
+    :timer.sleep(1000)
+    :ok
+  end
+
   describe "users" do
     test "list_users/0 returns all users" do
       user = insert(:user)
@@ -92,8 +103,12 @@ defmodule Exchanger.AccountsTest do
       transaction = insert(:transaction)
       assert_comparable(Accounts.get_transaction!(transaction.id), transaction)
     end
+  end
 
-    test "create_deposit_transaction/1 with valid data creates a transaction" do
+  describe "create_deposit/3" do
+    setup :start_store
+
+    test "with valid data creates a transaction" do
       wallet = insert(:wallet)
       user_id = wallet.user_id
       wallet_id = wallet.id
@@ -109,7 +124,7 @@ defmodule Exchanger.AccountsTest do
               }} = Accounts.create_deposit(wallet, wallet.currency, 500)
     end
 
-    test "create_deposit_transaction/1 with invalid data returns error changeset" do
+    test "with invalid data returns error changeset" do
       wallet = insert(:wallet)
 
       assert {:error, %Ecto.Changeset{}} = Accounts.create_deposit(wallet, wallet.currency, nil)
@@ -118,9 +133,69 @@ defmodule Exchanger.AccountsTest do
                Accounts.create_deposit(wallet, wallet.currency, 1_000_000_000)
     end
 
-    test "create_deposit_transaction/1 with a different currency creates an excpption" do
+    test "with a different currency raises an excpption" do
       assert_raise TransactionError, fn ->
         Accounts.create_deposit(insert(:wallet), "XZF", 1_000_000)
+      end
+    end
+  end
+
+  describe "create_transfer/3" do
+    setup :start_store
+
+    test "with valid data creates a transaction" do
+      from_user = insert(:user)
+      from_user_id = from_user.id
+      from_wallet = insert(:wallet, user: from_user, currency: "USD")
+      from_wallet_id = from_wallet.id
+      to_user = insert(:user)
+      to_user_id = to_user.id
+      to_wallet = insert(:wallet, user: to_user, currency: "CAD")
+      to_wallet_id = to_wallet.id
+
+      assert {:ok,
+              %Transaction{
+                type: "transfer",
+                from_amount: 1000,
+                to_amount: 3520,
+                to_user_id: ^to_user_id,
+                from_user_id: ^from_user_id,
+                to_wallet_id: ^to_wallet_id,
+                from_wallet_id: ^from_wallet_id,
+                from_currency: "USD",
+                to_currency: "CAD",
+                exchange_rate: 3.52
+              }} = Accounts.create_transfer(from_wallet, to_wallet, 1_000)
+    end
+
+    test "with same currencies creates a transaction" do
+      from_user = insert(:user)
+      from_user_id = from_user.id
+      from_wallet = insert(:wallet, user: from_user, currency: "CAD")
+      from_wallet_id = from_wallet.id
+      to_user = insert(:user)
+      to_user_id = to_user.id
+      to_wallet = insert(:wallet, user: to_user, currency: "CAD")
+      to_wallet_id = to_wallet.id
+
+      assert {:ok,
+              %Transaction{
+                type: "transfer",
+                from_amount: 3000,
+                to_amount: 3000,
+                to_user_id: ^to_user_id,
+                from_user_id: ^from_user_id,
+                to_wallet_id: ^to_wallet_id,
+                from_wallet_id: ^from_wallet_id,
+                from_currency: "CAD",
+                to_currency: "CAD",
+                exchange_rate: 1.0
+              }} = Accounts.create_transfer(from_wallet, to_wallet, 3000)
+    end
+
+    test "with a nil amount raises an exception" do
+      assert_raise TransactionError, fn ->
+        Accounts.create_transfer(insert(:wallet), insert(:wallet), nil)
       end
     end
   end

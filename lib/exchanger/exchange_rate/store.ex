@@ -11,6 +11,8 @@ defmodule Exchanger.ExchangeRate.Store do
   end
 
   @spec fetch_rate(currency, currency) :: rate_response
+  def fetch_rate(rate, rate), do: {:ok, %{rate: 1, updated: Timex.now()}}
+
   def fetch_rate(from, to) do
     case Agent.get(__MODULE__, &get_in(&1, [from, to])) do
       %{rate: _, updated: _} = data -> {:ok, data}

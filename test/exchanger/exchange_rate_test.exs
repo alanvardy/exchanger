@@ -16,8 +16,8 @@ defmodule Exchanger.ExchangeRateTest do
     end
 
     test "can get an exchange rate" do
-      assert {:ok, %{rate: "3.52", updated: %DateTime{}}} = ExchangeRate.fetch("USD", "CAD")
-      assert {:ok, %{rate: "2.33", updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "USD")
+      assert {:ok, %{rate: 3.52, updated: %DateTime{}}} = ExchangeRate.fetch("USD", "CAD")
+      assert {:ok, %{rate: 2.33, updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "USD")
     end
 
     test "cannot get rates for other currencies" do

@@ -4,8 +4,7 @@ defmodule Exchanger.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias Exchanger.Repo
-
+  alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Transaction, User, Wallet}
 
   @type change_tuple(struct) :: {:ok, struct} | {:error, Ecto.Changeset.t()}
@@ -16,6 +15,7 @@ defmodule Exchanger.Accounts do
   @type id :: pos_integer
   @type amount :: pos_integer
   @type currency :: String.t()
+  @type exchange_rate :: float
 
   # Users
 
@@ -90,5 +90,22 @@ defmodule Exchanger.Accounts do
     wallet
     |> Transaction.create_deposit_changeset(currency, amount)
     |> Repo.insert()
+  end
+
+  @spec create_transfer(wallet, wallet, amount) ::
+          change_tuple(transaction) | {:error, :rate_not_found}
+  def create_transfer(from_wallet, to_wallet, amount) do
+    %Wallet{currency: from_currency} = from_wallet
+    %Wallet{currency: to_currency} = to_wallet
+
+    case ExchangeRate.fetch(from_currency, to_currency) do
+      {:ok, %{rate: rate}} ->
+        from_wallet
+        |> Transaction.create_transfer_changeset(to_wallet, amount, rate)
+        |> Repo.insert()
+
+      error ->
+        error
+    end
   end
 end

@@ -20,7 +20,12 @@ defmodule Exchanger.ExchangeRate.Client do
           "6. Last Refreshed" => updated
         }
       } ->
-        {:ok, %{currencies: [from, to], rate: rate, updated: Timex.parse!(updated, "{RFC3339}")}}
+        {:ok,
+         %{
+           currencies: [from, to],
+           rate: String.to_float(rate),
+           updated: Timex.parse!(updated, "{RFC3339}")
+         }}
 
       body ->
         {:error, "Unrecognized body: #{body}"}

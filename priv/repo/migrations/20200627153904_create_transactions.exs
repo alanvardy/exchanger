@@ -5,6 +5,7 @@ defmodule Exchanger.Repo.Migrations.CreateTransactions do
     create table(:transactions) do
       add :from_amount, :integer
       add :from_currency, :string
+      add :type, :string
       add :to_amount, :integer
       add :to_currency, :string
       add :exchange_rate, :float

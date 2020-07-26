@@ -7,69 +7,75 @@ defmodule Exchanger.Accounts do
   alias Exchanger.Repo
   alias Exchanger.Accounts.{Transaction, User, Wallet}
 
-  @type id :: pos_integer
   @type success_tuple(struct) :: {:ok, struct} | {:error, Ecto.Changeset.t()}
+  @type user :: User.t()
+  @type wallet :: Wallet.t()
+  @type transaction :: Transaction.t()
+  @type changeset :: Ecto.Changeset.t()
+  @type id :: pos_integer
+  @type amount :: pos_integer
+  @type currency :: String.t()
 
-  @spec list_users :: [User.t()]
+  @spec list_users :: [user]
   def list_users do
     Repo.all(User)
   end
 
-  @spec get_user!(id) :: User.t()
+  @spec get_user!(id) :: user
   def get_user!(id), do: Repo.get!(User, id)
 
-  @spec create_user(map) :: success_tuple(User.t())
+  @spec create_user(map) :: success_tuple(user)
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
   end
 
-  @spec update_user(User.t(), map) :: success_tuple(User.t())
+  @spec update_user(user, map) :: success_tuple(user)
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
     |> Repo.update()
   end
 
-  @spec delete_user(User.t()) :: success_tuple(User.t())
+  @spec delete_user(user) :: success_tuple(user)
   def delete_user(%User{} = user) do
     Repo.delete(user)
   end
 
-  @spec change_user(User.t(), map) :: Ecto.Changeset.t()
-  @spec change_user(User.t()) :: Ecto.Changeset.t()
+  @spec change_user(user, map) :: changeset
+  @spec change_user(user) :: changeset
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
 
-  @spec list_wallets :: [Wallet.t()]
+  @spec list_wallets :: [wallet]
   def list_wallets do
     Repo.all(Wallet)
   end
 
-  @spec get_wallet!(id) :: Wallet.t()
+  @spec get_wallet!(id) :: wallet
   def get_wallet!(id), do: Repo.get!(Wallet, id)
 
-  @spec create_wallet(map) :: success_tuple(Wallet.t())
+  @spec create_wallet(map) :: success_tuple(wallet)
   def create_wallet(attrs) do
     attrs
     |> Wallet.create_changeset()
     |> Repo.insert()
   end
 
-  @spec list_transactions :: [Transaction.t()]
+  @spec list_transactions :: [transaction]
   def list_transactions do
     Repo.all(Transaction)
   end
 
-  @spec get_transaction!(id) :: Transaction.t()
+  @spec get_transaction!(id) :: transaction
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
-  @spec create_transaction(map) :: success_tuple(Transaction.t())
-  def create_transaction(attrs) do
-    attrs
-    |> Transaction.create_changeset()
+  @spec create_deposit(wallet, currency, amount) :: success_tuple(transaction)
+  def create_deposit(%Wallet{} = wallet, currency, amount) do
+    wallet
+    |> Transaction.create_deposit_changeset(currency, amount)
     |> Repo.insert()
   end
 end

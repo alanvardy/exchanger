@@ -2,10 +2,9 @@ defmodule Exchanger.AccountsTest do
   use Exchanger.DataCase
 
   alias Exchanger.Accounts
+  alias Exchanger.Accounts.{Transaction, TransactionError, User, Wallet}
 
   describe "users" do
-    alias Exchanger.Accounts.User
-
     test "list_users/0 returns all users" do
       user = insert(:user)
       assert Accounts.list_users() == [user]
@@ -56,8 +55,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "wallets" do
-    alias Exchanger.Accounts.Wallet
-
     test "list_wallets/0 returns all wallets" do
       wallet = insert(:wallet)
       assert_comparable(Accounts.list_wallets(), [wallet])
@@ -82,8 +79,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "transactions" do
-    alias Exchanger.Accounts.Transaction
-
     test "list_transactions/0 returns all transactions" do
       transaction = insert(:transaction)
       assert_comparable(Accounts.list_transactions(), [transaction])
@@ -94,25 +89,35 @@ defmodule Exchanger.AccountsTest do
       assert_comparable(Accounts.get_transaction!(transaction.id), transaction)
     end
 
-    test "create_transaction/1 with valid data creates a transaction" do
-      from_wallet = insert(:wallet)
-      to_wallet = insert(:wallet)
+    test "create_deposit_transaction/1 with valid data creates a transaction" do
+      wallet = insert(:wallet)
+      user_id = wallet.user_id
+      wallet_id = wallet.id
 
-      params =
-        params_for(:transaction,
-          from_wallet: from_wallet,
-          from_user: from_wallet.user,
-          to_wallet: to_wallet,
-          to_user: to_wallet.user
-        )
-
-      assert {:ok, %Transaction{} = transaction} = Accounts.create_transaction(params)
-      assert_comparable(params, transaction)
+      assert {:ok,
+              %Transaction{
+                type: "deposit",
+                to_amount: 500,
+                to_user_id: ^user_id,
+                to_wallet_id: ^wallet_id,
+                from_user_id: nil,
+                from_wallet_id: nil
+              }} = Accounts.create_deposit(wallet, wallet.currency, 500)
     end
 
-    test "create_transaction/1 with invalid data returns error changeset" do
+    test "create_deposit_transaction/1 with invalid data returns error changeset" do
+      wallet = insert(:wallet)
+
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_deposit(wallet, wallet.currency, nil)
+
       assert {:error, %Ecto.Changeset{}} =
-               Accounts.create_transaction(params_for(:transaction, from_currency: nil))
+               Accounts.create_deposit(wallet, wallet.currency, 1_000_000_000)
+    end
+
+    test "create_deposit_transaction/1 with a different currency creates an excpption" do
+      assert_raise TransactionError, fn ->
+        Accounts.create_deposit(insert(:wallet), "XZF", 1_000_000)
+      end
     end
   end
 end

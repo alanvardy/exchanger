@@ -3,8 +3,7 @@ defmodule Exchanger.Accounts.User do
   A record of a person with multiple wallets holding
   multiple transactions
   """
-  use TypedEctoSchema
-  import Ecto.Changeset
+  use Exchanger.Schema
   alias Exchanger.Accounts.{Transaction, Wallet}
 
   typed_schema "users" do

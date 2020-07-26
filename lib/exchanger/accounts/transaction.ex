@@ -1,7 +1,6 @@
 defmodule Exchanger.Accounts.Transaction do
   @moduledoc "An immutable record of financial transfers between wallets"
-  use TypedEctoSchema
-  import Ecto.Changeset
+  use Exchanger.Schema
   alias Exchanger.Accounts.{TransactionError, User, Wallet}
 
   @deposit_attrs [:to_amount, :to_currency, :to_user_id, :to_wallet_id, :type]

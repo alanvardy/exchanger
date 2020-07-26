@@ -47,11 +47,6 @@ defmodule Exchanger.AccountsTest do
       assert {:ok, %User{}} = Accounts.delete_user(user)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
     end
-
-    test "change_user/1 returns a user changeset" do
-      user = insert(:user)
-      assert %Ecto.Changeset{} = Accounts.change_user(user)
-    end
   end
 
   describe "wallets" do
@@ -75,6 +70,15 @@ defmodule Exchanger.AccountsTest do
     test "create_wallet/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Accounts.create_wallet(params_for(:wallet, currency: nil))
+    end
+
+    test "fetch_wallet_by_currency/2 with invalid data returns error changeset" do
+      user = insert(:user)
+      insert(:wallet, user: user, currency: "USD")
+      insert(:wallet, user: user, currency: "CAD")
+
+      assert {:ok, %Wallet{currency: "USD"}} = Accounts.fetch_wallet_by_currency(user, "USD")
+      assert {:ok, %Wallet{currency: "CAD"}} = Accounts.fetch_wallet_by_currency(user, "CAD")
     end
   end
 

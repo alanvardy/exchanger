@@ -54,6 +54,17 @@ defmodule Exchanger.Accounts do
     Repo.all(Wallet)
   end
 
+  def get_balance(%Wallet{id: id, currency: currency}) do
+    with query <- id |> Wallet.where_id() |> Wallet.with_transactions(),
+         %Wallet{sent_transactions: subs, received_transactions: adds} <- Repo.one(query),
+         additions <- Enum.reduce(adds, 0, fn x, acc -> x.to_amount + acc end),
+         subtractions <- Enum.reduce(subs, 0, fn x, acc -> x.from_amount + acc end) do
+      {:ok, {additions - subtractions, currency}}
+    else
+      nil -> {:error, :wallet_not_found}
+    end
+  end
+
   @spec get_wallet!(id) :: wallet
   def get_wallet!(id), do: Repo.get!(Wallet, id)
 

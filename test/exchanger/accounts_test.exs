@@ -195,4 +195,26 @@ defmodule Exchanger.AccountsTest do
       end
     end
   end
+
+  describe "get_balance/1" do
+    test "can get a balance with a deposit" do
+      wallet = insert(:wallet, currency: "USD")
+      {:ok, %Transaction{}} = Accounts.create_deposit(wallet, "USD", 10_000)
+      assert {:ok, {10_000, "USD"}} = Accounts.get_balance(wallet)
+    end
+
+    test "can get a balance with a deposit and transfers" do
+      wallet1 = insert(:wallet, currency: "USD")
+      wallet2 = insert(:wallet, currency: "USD")
+      wallet3 = insert(:wallet, currency: "USD")
+      {:ok, %Transaction{}} = Accounts.create_deposit(wallet1, "USD", 10_000)
+      {:ok, %Transaction{}} = Accounts.create_deposit(wallet3, "USD", 10_000)
+      {:ok, %Transaction{}} = Accounts.create_transfer(wallet1, wallet2, 5_000)
+      {:ok, %Transaction{}} = Accounts.create_transfer(wallet3, wallet1, 3_000)
+
+      assert {:ok, {8_000, "USD"}} = Accounts.get_balance(wallet1)
+      assert {:ok, {5_000, "USD"}} = Accounts.get_balance(wallet2)
+      assert {:ok, {7_000, "USD"}} = Accounts.get_balance(wallet3)
+    end
+  end
 end

@@ -1,4 +1,6 @@
 defmodule Exchanger.ExchangeRate do
+  use Boundary
+
   @moduledoc "The ExchangeRate context which holds all knowledge regarding the current exchange rates"
   @type response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 

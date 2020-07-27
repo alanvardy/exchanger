@@ -8,7 +8,7 @@ defmodule Exchanger.MixProject do
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: [warnings_as_errors: true],
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:boundary, :phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -50,7 +50,8 @@ defmodule Exchanger.MixProject do
       {:ex_machina, "~> 2.4", only: :test},
       {:ex_check, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:boundary, "~> 0.4.0", runtime: false}
     ]
   end
 

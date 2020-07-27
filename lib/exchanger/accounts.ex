@@ -3,6 +3,7 @@ defmodule Exchanger.Accounts do
   The Accounts context.
   """
 
+  use Boundary, deps: [Exchanger, Exchanger.{ExchangeRate, Schema}]
   import Ecto.Query, warn: false
   alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Transaction, User, Wallet}
@@ -14,8 +15,8 @@ defmodule Exchanger.Accounts do
   @type changeset :: Ecto.Changeset.t()
   @type id :: pos_integer
   @type amount :: pos_integer
-  @type currency :: String.t()
   @type exchange_rate :: float
+  @type currency :: String.t()
 
   # Users
 

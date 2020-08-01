@@ -147,14 +147,14 @@ defmodule Exchanger.AccountsTest do
               %Transaction{
                 type: "transfer",
                 from_amount: 1000,
-                to_amount: 3520,
+                to_amount: 1340,
                 to_user_id: ^to_user_id,
                 from_user_id: ^from_user_id,
                 to_wallet_id: ^to_wallet_id,
                 from_wallet_id: ^from_wallet_id,
                 from_currency: "USD",
                 to_currency: "CAD",
-                exchange_rate: 3.52
+                exchange_rate: 1.34
               }} = Accounts.create_transfer(from_wallet, to_wallet, 1_000)
     end
 
@@ -274,6 +274,7 @@ defmodule Exchanger.AccountsTest do
       )
 
       {:ok, %Balance{amount: 35, currency: "USD"}} = Accounts.fetch_user_balance(user_id, "USD")
+      {:ok, %Balance{amount: 46, currency: "CAD"}} = Accounts.fetch_user_balance(user_id, "CAD")
     end
   end
 end

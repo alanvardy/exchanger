@@ -253,5 +253,27 @@ defmodule Exchanger.AccountsTest do
 
       {:ok, %Balance{amount: 35}} = Accounts.fetch_user_balance(user_id, "USD")
     end
+
+    test "Can aggregate multiple wallets with different currencies" do
+      %User{id: user_id} = insert(:user)
+      %Wallet{id: usd_id} = insert(:wallet, currency: "USD", user_id: user_id)
+      %Wallet{id: cad_id} = insert(:wallet, currency: "CAD", user_id: user_id)
+
+      insert(:deposit,
+        to_currency: "USD",
+        to_amount: 20,
+        to_wallet_id: usd_id,
+        to_user_id: user_id
+      )
+
+      insert(:deposit,
+        to_currency: "CAD",
+        to_amount: 20,
+        to_wallet_id: cad_id,
+        to_user_id: user_id
+      )
+
+      {:ok, %Balance{amount: 35, currency: "USD"}} = Accounts.fetch_user_balance(user_id, "USD")
+    end
   end
 end

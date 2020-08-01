@@ -2,7 +2,7 @@ defmodule Exchanger.AccountsTest do
   use Exchanger.DataCase
 
   alias Exchanger.Accounts
-  alias Exchanger.Accounts.{Transaction, TransactionError, User, Wallet}
+  alias Exchanger.Accounts.{Balance, Transaction, TransactionError, User, Wallet}
 
   @currencies Application.get_env(:exchanger, :currencies)
 
@@ -95,19 +95,19 @@ defmodule Exchanger.AccountsTest do
 
   describe "transactions" do
     test "list_transactions/0 returns all transactions" do
-      transaction = insert(:transaction)
+      transaction = insert(:transfer)
       assert_comparable(Accounts.list_transactions(), [transaction])
     end
 
     test "get_transaction!/1 returns the transaction with given id" do
-      transaction = insert(:transaction)
+      transaction = insert(:transfer)
       assert_comparable(Accounts.get_transaction!(transaction.id), transaction)
     end
   end
 
   describe "create_deposit/3" do
     test "with valid data creates a transaction" do
-      wallet = insert(:wallet)
+      wallet = insert(:wallet, user: build(:user))
       user_id = wallet.user_id
       wallet_id = wallet.id
 
@@ -129,12 +129,6 @@ defmodule Exchanger.AccountsTest do
 
       assert {:error, %Ecto.Changeset{}} =
                Accounts.create_deposit(wallet, wallet.currency, 1_000_000_000)
-    end
-
-    test "with a different currency raises an excpption" do
-      assert_raise TransactionError, fn ->
-        Accounts.create_deposit(insert(:wallet), "XZF", 1_000_000)
-      end
     end
   end
 
@@ -196,25 +190,47 @@ defmodule Exchanger.AccountsTest do
     end
   end
 
-  describe "get_balance/1" do
+  describe "get_wallet_balance!/1" do
     test "can get a balance with a deposit" do
-      wallet = insert(:wallet, currency: "USD")
+      wallet = insert(:wallet, currency: "USD", user: build(:user))
       {:ok, %Transaction{}} = Accounts.create_deposit(wallet, "USD", 10_000)
-      assert {:ok, {10_000, "USD"}} = Accounts.get_balance(wallet)
+      assert %Balance{amount: 10_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet)
     end
 
     test "can get a balance with a deposit and transfers" do
-      wallet1 = insert(:wallet, currency: "USD")
-      wallet2 = insert(:wallet, currency: "USD")
-      wallet3 = insert(:wallet, currency: "USD")
+      wallet1 = insert(:wallet, currency: "USD", user: build(:user))
+      wallet2 = insert(:wallet, currency: "USD", user: build(:user))
+      wallet3 = insert(:wallet, currency: "USD", user: build(:user))
       {:ok, %Transaction{}} = Accounts.create_deposit(wallet1, "USD", 10_000)
       {:ok, %Transaction{}} = Accounts.create_deposit(wallet3, "USD", 10_000)
       {:ok, %Transaction{}} = Accounts.create_transfer(wallet1, wallet2, 5_000)
       {:ok, %Transaction{}} = Accounts.create_transfer(wallet3, wallet1, 3_000)
 
-      assert {:ok, {8_000, "USD"}} = Accounts.get_balance(wallet1)
-      assert {:ok, {5_000, "USD"}} = Accounts.get_balance(wallet2)
-      assert {:ok, {7_000, "USD"}} = Accounts.get_balance(wallet3)
+      assert %Balance{amount: 8_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet1)
+      assert %Balance{amount: 5_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet2)
+      assert %Balance{amount: 7_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet3)
+    end
+  end
+
+  describe "fetch_user_balance/2" do
+    test "Returns 0 for no wallets" do
+      %User{id: user_id} = insert(:user)
+
+      {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(user_id, "USD")
+    end
+
+    test "Returns the balance of one wallet" do
+      %User{id: user_id} = insert(:user)
+      %Wallet{id: wallet_id} = insert(:wallet, currency: "USD", user_id: user_id)
+
+      insert(:deposit,
+        to_currency: "USD",
+        to_amount: 20,
+        to_wallet_id: wallet_id,
+        to_user_id: user_id
+      )
+
+      {:ok, %Balance{amount: 20}} = Accounts.fetch_user_balance(user_id, "USD")
     end
   end
 end

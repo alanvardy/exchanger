@@ -6,8 +6,9 @@ defmodule Exchanger.Accounts do
   use Boundary, deps: [Exchanger, Exchanger.{ExchangeRate, Schema}]
   import Ecto.Query, warn: false
   alias Exchanger.{ExchangeRate, Repo}
-  alias Exchanger.Accounts.{Transaction, User, Wallet}
+  alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
+  @type response(data) :: {:ok, data} | {:error, :wallet_not_found}
   @type change_tuple(struct) :: {:ok, struct} | {:error, Ecto.Changeset.t()}
   @type user :: User.t()
   @type wallet :: Wallet.t()
@@ -18,6 +19,8 @@ defmodule Exchanger.Accounts do
   @type exchange_rate :: float
   @type currency :: String.t()
 
+  @currencies Application.get_env(:exchanger, :currencies)
+
   # Users
 
   @spec list_users :: [user]
@@ -27,6 +30,18 @@ defmodule Exchanger.Accounts do
 
   @spec get_user!(id) :: user
   def get_user!(id), do: Repo.get!(User, id)
+
+  @spec fetch_user_with_wallets(id) :: {:ok, user} | {:error, :user_not_found}
+  def fetch_user_with_wallets(user_id) do
+    user_id
+    |> User.by_id()
+    |> User.with_wallets()
+    |> Repo.one()
+    |> case do
+      nil -> {:error, :user_not_found}
+      %User{} = user -> {:ok, user}
+    end
+  end
 
   @spec create_user(map) :: change_tuple(user)
   def create_user(attrs \\ %{}) do
@@ -54,22 +69,50 @@ defmodule Exchanger.Accounts do
     Repo.all(Wallet)
   end
 
-  def get_balance(%Wallet{id: id, currency: currency}) do
-    with query <- id |> Wallet.where_id() |> Wallet.with_transactions(),
-         %Wallet{sent_transactions: subs, received_transactions: adds} <- Repo.one(query),
-         additions <- Enum.reduce(adds, 0, fn x, acc -> x.to_amount + acc end),
-         subtractions <- Enum.reduce(subs, 0, fn x, acc -> x.from_amount + acc end) do
-      {:ok, {additions - subtractions, currency}}
-    else
-      nil -> {:error, :wallet_not_found}
+  @spec fetch_user_balance(id, currency) :: {:ok, Balance.t()} | {:error, :user_not_found}
+  def fetch_user_balance(user_id, currency) when currency in @currencies do
+    case fetch_user_with_wallets(user_id) do
+      {:ok, %User{wallets: wallets}} ->
+        aggregate_balances(wallets, currency)
+
+      error ->
+        error
     end
+  end
+
+  defp aggregate_balances(wallets, currency, sum \\ 0)
+
+  defp aggregate_balances([], currency, sum) do
+    {:ok, %Balance{amount: sum, currency: currency, timestamp: Timex.now()}}
+  end
+
+  defp aggregate_balances([wallet | tail], currency, sum) do
+    {:ok, %Balance{amount: amount}} =
+      wallet
+      |> get_wallet_balance!()
+      |> ExchangeRate.convert(currency)
+
+    aggregate_balances(tail, currency, sum + amount)
+  end
+
+  @spec get_wallet_balance!(Wallet.t()) :: Balance.t()
+  def get_wallet_balance!(%Wallet{id: id, currency: currency}) do
+    %Wallet{sent_transactions: subs, received_transactions: adds} =
+      id
+      |> Wallet.where_id()
+      |> Wallet.with_transactions()
+      |> Repo.one!()
+
+    additions = Enum.reduce(adds, 0, fn x, acc -> x.to_amount + acc end)
+    subtractions = Enum.reduce(subs, 0, fn x, acc -> x.from_amount + acc end)
+    %Balance{amount: additions - subtractions, currency: currency, timestamp: Timex.now()}
   end
 
   @spec get_wallet!(id) :: wallet
   def get_wallet!(id), do: Repo.get!(Wallet, id)
 
   @spec fetch_wallet_by_currency(user, currency) :: {:ok, wallet} | {:error, :wallet_not_found}
-  def fetch_wallet_by_currency(%User{id: user_id}, currency) do
+  def fetch_wallet_by_currency(%User{id: user_id}, currency) when currency in @currencies do
     user_id
     |> Wallet.where_user_id()
     |> Wallet.where_currency(currency)
@@ -98,7 +141,7 @@ defmodule Exchanger.Accounts do
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
   @spec create_deposit(wallet, currency, amount) :: change_tuple(transaction)
-  def create_deposit(%Wallet{} = wallet, currency, amount) do
+  def create_deposit(%Wallet{} = wallet, currency, amount) when currency in @currencies do
     wallet
     |> Transaction.create_deposit_changeset(currency, amount)
     |> Repo.insert()

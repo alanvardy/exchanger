@@ -23,4 +23,12 @@ defmodule Exchanger.Accounts.User do
     |> cast(attrs, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
   end
+
+  def by_id(query \\ __MODULE__, id) do
+    from(q in query, where: q.id == ^id)
+  end
+
+  def with_wallets(query \\ __MODULE__) do
+    from(q in query, preload: :wallets)
+  end
 end

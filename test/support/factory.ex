@@ -7,21 +7,25 @@ defmodule Exchanger.Factory do
 
   @currencies Application.get_env(:exchanger, :currencies)
 
-  @spec transaction_factory :: Transaction.t()
-  def transaction_factory do
-    from_user = insert(:user)
-    to_user = insert(:user)
-
+  @spec transfer_factory :: Transaction.t()
+  def transfer_factory do
     %Transaction{
-      from_user: from_user,
-      from_wallet: build(:wallet, user: from_user),
-      to_user: to_user,
-      to_wallet: build(:wallet, user: to_user),
       from_currency: currency(),
       from_amount: pos_integer(),
       to_currency: currency(),
       to_amount: pos_integer(),
-      exchange_rate: float(0.1, 10)
+      exchange_rate: float(0.1, 10),
+      type: "transfer"
+    }
+  end
+
+  @spec deposit_factory :: Transaction.t()
+  def deposit_factory do
+    %Transaction{
+      to_currency: currency(),
+      to_amount: pos_integer(),
+      exchange_rate: float(0.1, 10),
+      type: "deposit"
     }
   end
 
@@ -36,8 +40,7 @@ defmodule Exchanger.Factory do
   @spec wallet_factory :: Wallet.t()
   def wallet_factory do
     %Wallet{
-      currency: currency(),
-      user: build(:user)
+      currency: currency()
     }
   end
 

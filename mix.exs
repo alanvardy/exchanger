@@ -44,6 +44,7 @@ defmodule Exchanger.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 1.6"},
       {:typed_ecto_schema, "~> 0.1.0"},
+      {:typed_struct, "~> 0.2.1"},
       {:absinthe, "~> 1.5.0"},
       {:absinthe_plug, "~> 1.5.0"},
       {:timex, "~> 3.5"},

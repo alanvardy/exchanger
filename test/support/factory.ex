@@ -3,7 +3,7 @@ defmodule Exchanger.Factory do
     ExMachina fixtures for test cases.
   """
   use ExMachina.Ecto, repo: Exchanger.Repo
-  alias Exchanger.Accounts.{Transaction, User, Wallet}
+  alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
   @currencies Application.get_env(:exchanger, :currencies)
 
@@ -42,6 +42,12 @@ defmodule Exchanger.Factory do
     %Wallet{
       currency: currency()
     }
+  end
+
+  @spec balance_factory :: Balance.t()
+  def balance_factory do
+    # Not a schema, so build rather than insert me
+    %Balance{amount: 20, currency: "USD", timestamp: Timex.now()}
   end
 
   defp currency, do: Enum.random(@currencies)

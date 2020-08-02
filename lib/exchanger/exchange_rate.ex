@@ -10,8 +10,8 @@ defmodule Exchanger.ExchangeRate do
   @spec fetch(currency, currency) :: response(%{rate: float, updated: DateTime.t()})
   defdelegate fetch(from_currency, to_currency), to: Exchanger.ExchangeRate.Store, as: :fetch_rate
 
-  @spec convert(Balance.t(), currency) :: response(Balance.t())
-  def convert(%Balance{amount: amount, currency: from_currency}, to_currency) do
+  @spec equivalent_in_currency(Balance.t(), currency) :: response(Balance.t())
+  def equivalent_in_currency(%Balance{amount: amount, currency: from_currency}, to_currency) do
     case fetch(from_currency, to_currency) do
       {:ok, %{rate: rate}} ->
         amount = floor(amount * rate)

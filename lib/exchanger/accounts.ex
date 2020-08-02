@@ -90,7 +90,7 @@ defmodule Exchanger.Accounts do
     {:ok, %Balance{amount: amount}} =
       wallet
       |> get_wallet_balance!()
-      |> ExchangeRate.convert(currency)
+      |> ExchangeRate.equivalent_in_currency(currency)
 
     aggregate_balances(tail, currency, sum + amount)
   end

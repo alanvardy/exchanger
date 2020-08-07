@@ -22,7 +22,7 @@ defmodule Exchanger.ExchangeRate.Client do
       } ->
         {:ok,
          %{
-           currencies: [from, to],
+           currencies: {from, to},
            rate: String.to_float(rate),
            updated: Timex.parse!(updated, "{RFC3339}")
          }}

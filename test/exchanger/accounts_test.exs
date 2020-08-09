@@ -156,6 +156,9 @@ defmodule Exchanger.AccountsTest do
                 to_currency: "CAD",
                 exchange_rate: 1.34
               }} = Accounts.create_transfer(from_wallet, to_wallet, 1_000)
+
+      assert %Wallet{balance: 1340, updated_at: updated_at} = Accounts.get_wallet!(to_wallet_id)
+      assert %Wallet{balance: -1000} = Accounts.get_wallet!(from_wallet_id)
     end
 
     test "with same currencies creates a transaction" do

@@ -40,6 +40,7 @@ defmodule Exchanger.Factory do
   @spec wallet_factory :: Wallet.t()
   def wallet_factory do
     %Wallet{
+      balance: 0,
       currency: currency()
     }
   end

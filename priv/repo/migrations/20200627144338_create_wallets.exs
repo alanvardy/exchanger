@@ -4,6 +4,7 @@ defmodule Exchanger.Repo.Migrations.CreateWallets do
   def change do
     create table(:wallets) do
       add :currency, :string
+      add :balance, :integer, default: 0
       add :user_id, references(:users, on_delete: :nothing)
 
       timestamps()

@@ -14,6 +14,7 @@ defmodule Exchanger.Accounts.Wallet do
 
   typed_schema "wallets" do
     field :currency, :string, null: false
+    field :balance, :integer, null: false
     belongs_to :user, User
     has_many :sent_transactions, Transaction, foreign_key: :from_wallet_id
     has_many :received_transactions, Transaction, foreign_key: :to_wallet_id

@@ -1,0 +1,25 @@
+version: '3'
+services:
+  alphavantage:
+    image: "alanvardy/alphavantage:latest"
+    ports:
+      - "4001:4001"
+
+  dbserver:
+    image: postgres:12.4
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 6000:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=1000"
+      - "-c"
+      # default is 32MB;
+      - "shared_buffers=128MB"
+    volumes:
+      - dbserver_data:/var/lib/postgresql/data
+volumes:
+  dbserver_data:

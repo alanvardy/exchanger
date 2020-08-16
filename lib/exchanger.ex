@@ -1,6 +1,4 @@
 defmodule Exchanger do
-  use Boundary, deps: [ExchangerWeb], exports: [Repo]
-
   @moduledoc """
   Exchanger keeps the contexts that define your domain
   and business logic.

@@ -1,6 +1,4 @@
 defmodule Exchanger.ExchangeRate do
-  use Boundary
-
   alias Exchanger.Accounts.Balance
 
   @moduledoc "The ExchangeRate context which holds all knowledge regarding the current exchange rates"

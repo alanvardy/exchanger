@@ -13,6 +13,10 @@ config :exchanger,
   currency_refresh: 100,
   api_client: Exchanger.ExchangeRate.Client.Http
 
+config :ecto_shorts,
+  repo: Exchanger.Repo,
+  error_module: EctoShorts.Actions.Error
+
 # Configures the endpoint
 config :exchanger, ExchangerWeb.Endpoint,
   url: [host: "localhost"],

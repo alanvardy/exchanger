@@ -3,8 +3,8 @@ defmodule Exchanger.Accounts do
   The Accounts context.
   """
 
-  use Boundary, deps: [Exchanger, Exchanger.{ExchangeRate, Schema}]
   import Ecto.Query, warn: false
+  alias EctoShorts.Actions
   alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
@@ -18,10 +18,24 @@ defmodule Exchanger.Accounts do
   @type amount :: pos_integer
   @type exchange_rate :: float
   @type currency :: String.t()
+  @type params :: keyword | map
 
   @currencies Application.get_env(:exchanger, :currencies)
 
   # Users
+
+  @spec all_users(params) :: {:ok, [User.t()]} | {:error, binary}
+  def all_users(params) do
+    # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(User, params)
+    result = Actions.all(from(u in User), params)
+    {:ok, result}
+  end
+
+  @spec find_user(params) :: {:error, binary} | {:ok, User.t()}
+  def find_user(params) do
+    # Hard Dialyzer fail with Actions.find(User, params)
+    from(u in User) |> Actions.find(params) |> IO.inspect(label: "37")
+  end
 
   @spec list_users :: [user]
   def list_users do

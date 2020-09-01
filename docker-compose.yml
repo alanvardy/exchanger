@@ -1,7 +1,7 @@
 version: '3'
 services:
   alphavantage:
-    image: "alanvardy/alphavantage:latest"
+    image: "mikaak/alpha-vantage"
     ports:
       - "4001:4001"
 

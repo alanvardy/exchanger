@@ -3,25 +3,16 @@ defmodule ExchangerWeb.Schema do
   use Absinthe.Schema
 
   import_types(ExchangerWeb.Types.User)
-  # import_types(ExchangerWeb.Types.Preference)
-  # import_types(ExchangerWeb.Types.Metric)
   import_types(ExchangerWeb.Queries.User)
-  # import_types(ExchangerWeb.Queries.Preference)
-  # import_types(ExchangerWeb.Queries.Metric)
   import_types(ExchangerWeb.Mutations.User)
-  # import_types(ExchangerWeb.Mutations.Preference)
-  # import_types(ExchangerWeb.Subscriptions.Preference)
 
   query do
     import_fields(:user_queries)
-    #   import_fields :preference_queries
-    #   import_fields :metric_queries
   end
 
-  # mutation do
-  #   import_fields :user_mutations
-  #   import_fields :preference_mutations
-  # end
+  mutation do
+    import_fields(:user_mutations)
+  end
 
   # subscription do
   #   import_fields :preference_subscriptions

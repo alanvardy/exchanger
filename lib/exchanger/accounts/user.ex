@@ -23,7 +23,7 @@ defmodule Exchanger.Accounts.User do
     |> validate_required([:first_name, :last_name])
   end
 
-  def update_changeset(user, attrs) do
+  def changeset(user, attrs) do
     user
     |> cast(attrs, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])

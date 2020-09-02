@@ -3,6 +3,29 @@ defmodule Exchanger.Helpers do
   Test helpers, imported into all test files
   """
   import ExUnit.Assertions
+  alias Exchanger.Accounts
+  alias ExchangerWeb.Schema
+
+  @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
+
+  @spec run_schema(String.t(), %{optional(String.t()) => any()}) :: any
+  def run_schema(document, variables) do
+    assert {:ok, %{data: data}} = Absinthe.run(document, Schema, variables: variables)
+    data
+  end
+
+  @doc "Creates users for a list of maps containing the paramers"
+  @spec create_users([map]) :: [User.t()]
+  def create_users(users_params) do
+    for params <- users_params, do: create_user(params)
+  end
+
+  @doc "Creates a user from a map of parameters"
+  @spec create_user(map) :: User.t()
+  def create_user(user_params) do
+    {:ok, user} = Accounts.create_user(user_params)
+    user
+  end
 
   @doc """
   Compares maps/structs or lists of maps/structs together after stripping
@@ -10,9 +33,6 @@ defmodule Exchanger.Helpers do
   This enables the comparison of params with the created struct,
   or an ex_machina return value with a database sourced value.
   """
-
-  @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
-
   @spec assert_comparable([map] | map, [map] | map) :: true
   def assert_comparable([], []), do: true
 

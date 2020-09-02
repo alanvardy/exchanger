@@ -13,13 +13,23 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
     }
   """
 
+  @users_doc """
+    query findUsers($first_name: String, $last_name: String) {
+      users(first_name: $first_name, last_name: $last_name) {
+        id,
+        first_name,
+        last_name
+      }
+    }
+  """
+
   @user_params %{
     first_name: "Nancy",
     last_name: "Bell"
   }
 
   describe "@user" do
-    test "Can get the user by name" do
+    test "Can get user by name" do
       assert {:ok, user} = Accounts.create_user(@user_params)
 
       assert {:ok, %{data: data}} =
@@ -33,6 +43,24 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
         |> String.to_integer()
 
       assert user_id === user.id
+    end
+  end
+
+  describe "@users" do
+    test "Can get users by name" do
+      assert {:ok, user} = Accounts.create_user(@user_params)
+
+      assert {:ok, %{data: data}} =
+               Absinthe.run(@users_doc, Schema,
+                 variables: %{"first_name" => "Nancy", "last_name" => "Bell"}
+               )
+
+      user_ids =
+        data
+        |> Map.get("users")
+        |> Enum.map(&String.to_integer(&1["id"]))
+
+      assert user_ids === [user.id]
     end
   end
 end

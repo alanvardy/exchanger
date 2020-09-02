@@ -3,7 +3,7 @@ services:
   alphavantage:
     image: "mikaak/alpha-vantage"
     ports:
-      - "4001:4001"
+      - "4001:4000"
 
   dbserver:
     image: postgres:12.4

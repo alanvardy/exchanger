@@ -4,12 +4,15 @@ defmodule Exchanger.ExchangeRate.Client.Http do
   @behaviour Exchanger.ExchangeRate.Client.Behaviour
 
   @type currency :: String.t()
-  @base_url "http://localhost:4001/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
-  @api_key "demo"
+
+  @address Application.get_env(:exchanger, :exchange_rate_address)
+  @query "/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
+  @api_key Application.get_env(:exchanger, :exchange_rate_api_key)
 
   @spec get_rate(currency, currency) :: {:error, String.t()} | {:ok, map}
   def get_rate(from_currency, to_currency) do
-    with url <- "#{@base_url}#{from_currency}&to_currency=#{to_currency}&apikey=#{@api_key}",
+    with url <-
+           "#{@address}#{@query}#{from_currency}&to_currency=#{to_currency}&apikey=#{@api_key}",
          {:ok, %Response{status_code: 200, body: body}} <- HTTPoison.get(url),
          {:ok, decoded} <- Jason.decode(body) do
       {:ok, decoded}

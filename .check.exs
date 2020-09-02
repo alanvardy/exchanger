@@ -20,7 +20,7 @@
     #  command: "mix coveralls.html",
     #  require_files: ["test/test_helper.exs"],
     #  env: %{"MIX_ENV" => "test"}},
-    {:formatter, command: "mix format"},
+    {:format, command: "mix format"},
     {:credo, command: "mix credo --strict", deps: [:format]},
     {:ex_unit, command: "mix test", env: %{"MIX_ENV" => "test"}, deps: [:format, :credo]}
 

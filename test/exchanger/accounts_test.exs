@@ -38,26 +38,26 @@ defmodule Exchanger.AccountsTest do
                Accounts.create_user(params_for(:user, first_name: nil))
     end
 
-    test "update_user/2 with valid data updates the user" do
-      user = insert(:user)
-      params = params_for(:user)
-      assert {:ok, %User{} = user} = Accounts.update_user(user, params)
-      assert user.first_name == params.first_name
-      assert user.last_name == params.last_name
-    end
+    # test "update_user/2 with valid data updates the user" do
+    #   user = insert(:user)
+    #   params = params_for(:user)
+    #   assert {:ok, %User{} = user} = Accounts.update_user(user, params)
+    #   assert user.first_name == params.first_name
+    #   assert user.last_name == params.last_name
+    # end
 
-    test "update_user/2 with invalid data returns error changeset" do
-      user = insert(:user)
-      params = params_for(:user, first_name: "")
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, params)
-      assert user == Accounts.get_user!(user.id)
-    end
+    # test "update_user/2 with invalid data returns error changeset" do
+    #   user = insert(:user)
+    #   params = params_for(:user, first_name: "")
+    #   assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, params)
+    #   assert user == Accounts.get_user!(user.id)
+    # end
 
-    test "delete_user/1 deletes the user" do
-      user = insert(:user)
-      assert {:ok, %User{}} = Accounts.delete_user(user)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
-    end
+    # test "delete_user/1 deletes the user" do
+    #   user = insert(:user)
+    #   assert {:ok, %User{}} = Accounts.delete_user(user)
+    #   assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
+    # end
   end
 
   describe "wallets" do

@@ -34,7 +34,7 @@ defmodule Exchanger.Accounts do
   @spec find_user(params) :: {:error, binary} | {:ok, User.t()}
   def find_user(params) do
     # Hard Dialyzer fail with Actions.find(User, params)
-    from(u in User) |> Actions.find(params) |> IO.inspect(label: "37")
+    from(u in User) |> Actions.find(params)
   end
 
   @spec list_users :: [user]
@@ -57,23 +57,17 @@ defmodule Exchanger.Accounts do
     end
   end
 
-  @spec create_user(map) :: change_tuple(user)
-  def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
+  @spec create_user(params) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  def create_user(params) do
+    Actions.create(User, params)
   end
 
-  @spec update_user(user, map) :: change_tuple(user)
-  def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @spec delete_user(user) :: change_tuple(user)
-  def delete_user(%User{} = user) do
-    Repo.delete(user)
+  @spec update_user(%{id: binary}) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  def update_user(%{id: id} = params) do
+    with {:ok, user} <- find_user(%{id: String.to_integer(id)}) do
+      params = Map.delete(params, :id)
+      Actions.update(User, user, params)
+    end
   end
 
   # Wallets

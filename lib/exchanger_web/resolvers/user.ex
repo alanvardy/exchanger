@@ -13,18 +13,16 @@ defmodule ExchangerWeb.Resolvers.User do
 
   @spec find(params, any) :: {:error, binary} | {:ok, User.t()}
   def find(params, _) do
-    Accounts.find_user(params) |> IO.inspect(label: "16")
+    Accounts.find_user(params)
   end
 
-  # @spec create(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
-  # def create(params, _) do
-  #   Metrics.register_resolver_hit("create_user")
-  #   Accounts.create_user(params)
-  # end
+  @spec create(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  def create(params, _) do
+    Accounts.create_user(params)
+  end
 
-  # @spec update(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
-  # def update(params, _) do
-  #   Metrics.register_resolver_hit("update_user")
-  #   Accounts.update_user(params)
-  # end
+  @spec update(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  def update(params, _) do
+    Accounts.update_user(params)
+  end
 end

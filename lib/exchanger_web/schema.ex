@@ -8,7 +8,7 @@ defmodule ExchangerWeb.Schema do
   import_types(ExchangerWeb.Queries.User)
   # import_types(ExchangerWeb.Queries.Preference)
   # import_types(ExchangerWeb.Queries.Metric)
-  # import_types(ExchangerWeb.Mutations.User)
+  import_types(ExchangerWeb.Mutations.User)
   # import_types(ExchangerWeb.Mutations.Preference)
   # import_types(ExchangerWeb.Subscriptions.Preference)
 

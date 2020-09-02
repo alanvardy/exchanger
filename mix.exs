@@ -9,6 +9,7 @@ defmodule Exchanger.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: [warnings_as_errors: true],
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      dialyzer: dialyzer(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -28,6 +29,13 @@ defmodule Exchanger.MixProject do
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp dialyzer do
+    [
+      plt_add_deps: :transitive,
+      ignore_warnings: ".dialyzer_ignore.exs"
+    ]
+  end
 
   # Specifies your project dependencies.
   #

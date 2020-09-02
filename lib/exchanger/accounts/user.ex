@@ -17,7 +17,13 @@ defmodule Exchanger.Accounts.User do
   end
 
   @doc false
-  def changeset(user, attrs) do
+  def create_changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, [:first_name, :last_name])
+    |> validate_required([:first_name, :last_name])
+  end
+
+  def update_changeset(user, attrs) do
     user
     |> cast(attrs, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])

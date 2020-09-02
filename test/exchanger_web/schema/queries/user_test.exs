@@ -1,7 +1,5 @@
 defmodule ExchangerWeb.Schema.Queries.UserTest do
   use Exchanger.DataCase, async: true
-  alias Exchanger.Accounts
-  alias ExchangerWeb.Schema
 
   @user_doc """
     query findUser($first_name: String, $last_name: String) {
@@ -28,17 +26,15 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
     last_name: "Bell"
   }
 
+  setup do
+    %{user: create_user(@user_params)}
+  end
+
   describe "@user" do
-    test "Can get user by name" do
-      assert {:ok, user} = Accounts.create_user(@user_params)
-
-      assert {:ok, %{data: data}} =
-               Absinthe.run(@user_doc, Schema,
-                 variables: %{"first_name" => "Nancy", "last_name" => "Bell"}
-               )
-
+    test "Can get user by name", %{user: user} do
       user_id =
-        data
+        @user_doc
+        |> run_schema(%{"first_name" => "Nancy", "last_name" => "Bell"})
         |> get_in(["user", "id"])
         |> String.to_integer()
 
@@ -47,16 +43,10 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
   end
 
   describe "@users" do
-    test "Can get users by name" do
-      assert {:ok, user} = Accounts.create_user(@user_params)
-
-      assert {:ok, %{data: data}} =
-               Absinthe.run(@users_doc, Schema,
-                 variables: %{"first_name" => "Nancy", "last_name" => "Bell"}
-               )
-
+    test "Can get users by name", %{user: user} do
       user_ids =
-        data
+        @users_doc
+        |> run_schema(%{"first_name" => "Nancy", "last_name" => "Bell"})
         |> Map.get("users")
         |> Enum.map(&String.to_integer(&1["id"]))
 

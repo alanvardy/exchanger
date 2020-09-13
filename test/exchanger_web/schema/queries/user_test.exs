@@ -40,6 +40,16 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
 
       assert user_id === user.id
     end
+
+    test "Can get user by id", %{user: user} do
+      user_id =
+        @user_doc
+        |> run_schema(%{"id" => user.id})
+        |> get_in(["user", "id"])
+        |> String.to_integer()
+
+      assert user_id === user.id
+    end
   end
 
   describe "@users" do

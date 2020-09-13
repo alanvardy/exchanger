@@ -61,11 +61,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "wallets" do
-    test "list_wallets/0 returns all wallets" do
-      wallet = insert(:wallet)
-      assert_comparable(Accounts.list_wallets(), [wallet])
-    end
-
     test "get_wallet!/1 returns the wallet with given id" do
       wallet = insert(:wallet)
       assert_comparable(Accounts.get_wallet!(wallet.id), wallet)

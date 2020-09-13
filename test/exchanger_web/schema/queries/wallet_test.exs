@@ -1,0 +1,89 @@
+defmodule ExchangerWeb.Schema.Queries.WalletTest do
+  use Exchanger.DataCase, async: true
+
+  @wallet_doc """
+    query findWallet($id: ID, $user_id: ID, $currency: String) {
+      wallet(id: $id, user_id: $user_id, currency: $currency) {
+        id,
+        user_id,
+        currency,
+        user {
+          id,
+          first_name,
+          last_name
+        }
+      }
+    }
+  """
+
+  @wallets_doc """
+    query findWallets($user_id: ID, $currency: String) {
+      wallets(user_id: $user_id, currency: $currency) {
+        id,
+        user_id,
+        currency
+      }
+    }
+  """
+
+  @user_params %{
+    first_name: "Nancy",
+    last_name: "Bell"
+  }
+
+  @wallet_params %{
+    currency: "USD"
+  }
+
+  setup do
+    user = create_user(@user_params)
+    wallet = create_wallet(Map.merge(@wallet_params, %{user_id: user.id}))
+    %{user: user, wallet: wallet}
+  end
+
+  describe "@wallet" do
+    test "Can get wallet by currency", %{wallet: wallet} do
+      wallet_id =
+        @wallet_doc
+        |> run_schema(%{"currency" => "USD"})
+        |> get_in(["wallet", "id"])
+        |> String.to_integer()
+
+      assert wallet_id === wallet.id
+    end
+
+    test "Gets the wallets owner", %{user: user} do
+      user_id =
+        @wallet_doc
+        |> run_schema(%{"currency" => "USD"})
+        |> get_in(["wallet", "user", "id"])
+        |> String.to_integer()
+
+      assert user_id === user.id
+    end
+
+    test "Can get wallet by user_id", %{user: user, wallet: wallet} do
+      wallet_id =
+        @wallet_doc
+        |> run_schema(%{"user_id" => user.id})
+        |> get_in(["wallet", "id"])
+        |> String.to_integer()
+
+      assert wallet_id === wallet.id
+    end
+  end
+
+  describe "@wallets" do
+    test "Can get wallets by user_id", %{user: user, wallet: wallet1} do
+      wallet2 = create_wallet(Map.merge(@wallet_params, %{user_id: user.id}))
+
+      wallet_ids =
+        @wallets_doc
+        |> run_schema(%{"user_id" => user.id})
+        |> Map.get("wallets")
+        |> Enum.map(&String.to_integer(&1["id"]))
+
+      assert Enum.sort(wallet_ids) === Enum.sort([wallet1.id, wallet2.id])
+    end
+  end
+end

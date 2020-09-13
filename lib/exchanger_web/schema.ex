@@ -2,12 +2,15 @@ defmodule ExchangerWeb.Schema do
   @moduledoc "Main schema for Absinthe"
   use Absinthe.Schema
 
+  import_types(ExchangerWeb.Types.Wallet)
   import_types(ExchangerWeb.Types.User)
+  import_types(ExchangerWeb.Queries.Wallet)
   import_types(ExchangerWeb.Queries.User)
   import_types(ExchangerWeb.Mutations.User)
 
   query do
     import_fields(:user_queries)
+    import_fields(:wallet_queries)
   end
 
   mutation do

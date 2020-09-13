@@ -72,9 +72,11 @@ defmodule Exchanger.Accounts do
 
   # Wallets
 
-  @spec list_wallets :: [wallet]
-  def list_wallets do
-    Repo.all(Wallet)
+  @spec all_wallets(params) :: {:ok, [Wallet.t()]} | {:error, binary}
+  def all_wallets(params) do
+    # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(Wallet, params)
+    result = Actions.all(from(u in Wallet), params)
+    {:ok, result}
   end
 
   @spec fetch_user_balance(id, currency) :: {:ok, Balance.t()} | {:error, :user_not_found}
@@ -114,6 +116,12 @@ defmodule Exchanger.Accounts do
     additions = Enum.reduce(adds, 0, fn x, acc -> x.to_amount + acc end)
     subtractions = Enum.reduce(subs, 0, fn x, acc -> x.from_amount + acc end)
     %Balance{amount: additions - subtractions, currency: currency, timestamp: Timex.now()}
+  end
+
+  @spec find_wallet(params) :: {:error, binary} | {:ok, Wallet.t()}
+  def find_wallet(params) do
+    # Hard Dialyzer fail with Actions.find(Wallet, params)
+    from(u in Wallet) |> Actions.find(params)
   end
 
   @spec get_wallet!(id) :: wallet

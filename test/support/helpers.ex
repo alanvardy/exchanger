@@ -6,6 +6,8 @@ defmodule Exchanger.Helpers do
   alias Exchanger.Accounts
   alias ExchangerWeb.Schema
 
+  alias Exchanger.Accounts.{User, Wallet}
+
   @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
 
   @spec run_schema(String.t(), %{optional(String.t()) => any()}) :: any
@@ -25,6 +27,19 @@ defmodule Exchanger.Helpers do
   def create_user(user_params) do
     {:ok, user} = Accounts.create_user(user_params)
     user
+  end
+
+  @doc "Creates wallets for a list of maps containing the paramers"
+  @spec create_wallets([map]) :: [Wallet.t()]
+  def create_wallets(wallets_params) do
+    for params <- wallets_params, do: create_wallet(params)
+  end
+
+  @doc "Creates a user from a map of parameters"
+  @spec create_wallet(map) :: Wallet.t()
+  def create_wallet(wallet_params) do
+    {:ok, wallet} = Accounts.create_wallet(wallet_params)
+    wallet
   end
 
   @doc """

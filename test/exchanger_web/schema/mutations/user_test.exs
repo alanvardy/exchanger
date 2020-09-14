@@ -2,11 +2,6 @@ defmodule ExchangerWeb.Schema.Mutations.UserTest do
   use Exchanger.DataCase, async: true
   alias Exchanger.Accounts
 
-  @user_params %{
-    "first_name" => "Duffy",
-    "last_name" => "Dogooder"
-  }
-
   @create_user_doc """
     mutation createUser($first_name: String, $last_name: String) {
       create_user(first_name: $first_name, last_name: $last_name) {
@@ -42,7 +37,7 @@ defmodule ExchangerWeb.Schema.Mutations.UserTest do
 
   describe "@update_user" do
     setup do
-      %{user: create_user(@user_params)}
+      %{user: insert(:user)}
     end
 
     test "updates a user", %{user: user} do

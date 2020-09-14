@@ -26,20 +26,15 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
     }
   """
 
-  @user_params %{
-    first_name: "Nancy",
-    last_name: "Bell"
-  }
-
   setup do
-    %{user: create_user(@user_params)}
+    %{user: insert(:user)}
   end
 
   describe "@user" do
     test "Can get user by name", %{user: user} do
       user_id =
         @user_doc
-        |> run_schema(%{"first_name" => "Nancy", "last_name" => "Bell"})
+        |> run_schema(%{"first_name" => user.first_name, "last_name" => user.last_name})
         |> get_in(["user", "id"])
         |> String.to_integer()
 
@@ -73,7 +68,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
     test "Can get users by name", %{user: user} do
       user_ids =
         @users_doc
-        |> run_schema(%{"first_name" => "Nancy", "last_name" => "Bell"})
+        |> run_schema(%{"first_name" => user.first_name, "last_name" => user.last_name})
         |> Map.get("users")
         |> Enum.map(&String.to_integer(&1["id"]))
 

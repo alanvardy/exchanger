@@ -26,18 +26,9 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
     }
   """
 
-  @user_params %{
-    first_name: "Nancy",
-    last_name: "Bell"
-  }
-
-  @wallet_params %{
-    currency: "USD"
-  }
-
   setup do
-    user = create_user(@user_params)
-    wallet = create_wallet(Map.merge(@wallet_params, %{user_id: user.id}))
+    user = insert(:user)
+    wallet = insert(:wallet, user_id: user.id)
     %{user: user, wallet: wallet}
   end
 
@@ -45,17 +36,17 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
     test "Can get wallet by currency", %{wallet: wallet} do
       wallet_id =
         @wallet_doc
-        |> run_schema(%{"currency" => "USD"})
+        |> run_schema(%{"currency" => wallet.currency})
         |> get_in(["wallet", "id"])
         |> String.to_integer()
 
       assert wallet_id === wallet.id
     end
 
-    test "Gets the wallets owner", %{user: user} do
+    test "Gets the wallets owner", %{wallet: wallet, user: user} do
       user_id =
         @wallet_doc
-        |> run_schema(%{"currency" => "USD"})
+        |> run_schema(%{"currency" => wallet.currency})
         |> get_in(["wallet", "user", "id"])
         |> String.to_integer()
 
@@ -75,7 +66,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
 
   describe "@wallets" do
     test "Can get wallets by user_id", %{user: user, wallet: wallet1} do
-      wallet2 = create_wallet(Map.merge(@wallet_params, %{user_id: user.id}))
+      wallet2 = insert(:wallet, user_id: user.id)
 
       wallet_ids =
         @wallets_doc

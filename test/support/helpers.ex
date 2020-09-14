@@ -3,10 +3,7 @@ defmodule Exchanger.Helpers do
   Test helpers, imported into all test files
   """
   import ExUnit.Assertions
-  alias Exchanger.Accounts
   alias ExchangerWeb.Schema
-
-  alias Exchanger.Accounts.{User, Wallet}
 
   @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
 
@@ -14,32 +11,6 @@ defmodule Exchanger.Helpers do
   def run_schema(document, variables) do
     assert {:ok, %{data: data}} = Absinthe.run(document, Schema, variables: variables)
     data
-  end
-
-  @doc "Creates users for a list of maps containing the paramers"
-  @spec create_users([map]) :: [User.t()]
-  def create_users(users_params) do
-    for params <- users_params, do: create_user(params)
-  end
-
-  @doc "Creates a user from a map of parameters"
-  @spec create_user(map) :: User.t()
-  def create_user(user_params) do
-    {:ok, user} = Accounts.create_user(user_params)
-    user
-  end
-
-  @doc "Creates wallets for a list of maps containing the paramers"
-  @spec create_wallets([map]) :: [Wallet.t()]
-  def create_wallets(wallets_params) do
-    for params <- wallets_params, do: create_wallet(params)
-  end
-
-  @doc "Creates a user from a map of parameters"
-  @spec create_wallet(map) :: Wallet.t()
-  def create_wallet(wallet_params) do
-    {:ok, wallet} = Accounts.create_wallet(wallet_params)
-    wallet
   end
 
   @doc """

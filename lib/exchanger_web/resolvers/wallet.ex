@@ -15,4 +15,9 @@ defmodule ExchangerWeb.Resolvers.Wallet do
   def all(params, _) do
     Accounts.all_wallets(params)
   end
+
+  @spec create(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, Wallet.t()}
+  def create(params, _) do
+    Accounts.create_wallet(params)
+  end
 end

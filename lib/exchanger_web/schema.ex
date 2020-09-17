@@ -3,9 +3,11 @@ defmodule ExchangerWeb.Schema do
   use Absinthe.Schema
 
   import_types(ExchangerWeb.Types.Balance)
+  import_types(ExchangerWeb.Types.Transaction)
   import_types(ExchangerWeb.Types.User)
   import_types(ExchangerWeb.Types.Wallet)
   import_types(ExchangerWeb.Queries.Balance)
+  import_types(ExchangerWeb.Queries.Transaction)
   import_types(ExchangerWeb.Queries.User)
   import_types(ExchangerWeb.Queries.Wallet)
   import_types(ExchangerWeb.Mutations.User)
@@ -13,6 +15,7 @@ defmodule ExchangerWeb.Schema do
 
   query do
     import_fields(:balance_queries)
+    import_fields(:transaction_queries)
     import_fields(:user_queries)
     import_fields(:wallet_queries)
   end

@@ -88,18 +88,6 @@ defmodule Exchanger.AccountsTest do
     end
   end
 
-  describe "transactions" do
-    test "list_transactions/0 returns all transactions" do
-      transaction = insert(:transfer)
-      assert_comparable(Accounts.list_transactions(), [transaction])
-    end
-
-    test "get_transaction!/1 returns the transaction with given id" do
-      transaction = insert(:transfer)
-      assert_comparable(Accounts.get_transaction!(transaction.id), transaction)
-    end
-  end
-
   describe "create_deposit/3" do
     test "with valid data creates a transaction" do
       wallet = insert(:wallet, user: build(:user))

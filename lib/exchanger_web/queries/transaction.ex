@@ -5,15 +5,23 @@ defmodule ExchangerWeb.Queries.Transaction do
 
   object :transaction_queries do
     field :transactions, list_of(:transaction) do
-      arg :first_name, :string
-      arg :last_name, :string
+      arg :from_user_id, :id
+      arg :from_wallet_id, :id
+      arg :from_currency, :string
+      arg :to_user_id, :id
+      arg :to_wallet_id, :id
+      arg :to_currency, :string
       resolve &Resolvers.Transaction.all/2
     end
 
     field :transaction, :transaction do
       arg :id, :id
-      arg :first_name, :string
-      arg :last_name, :string
+      arg :from_user_id, :id
+      arg :from_wallet_id, :id
+      arg :from_currency, :string
+      arg :to_user_id, :id
+      arg :to_wallet_id, :id
+      arg :to_currency, :string
       resolve &Resolvers.Transaction.find/2
     end
   end

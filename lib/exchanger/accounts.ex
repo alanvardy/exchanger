@@ -148,13 +148,18 @@ defmodule Exchanger.Accounts do
 
   # Transactions
 
-  @spec list_transactions :: [transaction]
-  def list_transactions do
-    Repo.all(Transaction)
+  @spec all_transactions(params) :: {:ok, [User.t()]} | {:error, binary}
+  def all_transactions(params) do
+    # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(Transaction, params)
+    result = Actions.all(from(u in Transaction), params)
+    {:ok, result}
   end
 
-  @spec get_transaction!(id) :: transaction
-  def get_transaction!(id), do: Repo.get!(Transaction, id)
+  @spec find_transaction(params) :: {:error, binary} | {:ok, User.t()}
+  def find_transaction(params) do
+    # Hard Dialyzer fail with Actions.find(Transaction, params)
+    from(u in Transaction) |> Actions.find(params)
+  end
 
   @spec create_deposit(wallet, currency, amount) :: change_tuple(transaction)
   def create_deposit(%Wallet{} = wallet, currency, amount) when currency in @currencies do

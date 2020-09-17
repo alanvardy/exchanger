@@ -1,5 +1,5 @@
 defmodule ExchangerWeb.Queries.Transaction do
-  @moduledoc "Absinthe queries for users"
+  @moduledoc "Absinthe queries for transactions"
   use Absinthe.Schema.Notation
   alias ExchangerWeb.Resolvers
 
@@ -11,6 +11,7 @@ defmodule ExchangerWeb.Queries.Transaction do
       arg :to_user_id, :id
       arg :to_wallet_id, :id
       arg :to_currency, :string
+      arg :type, :string
       resolve &Resolvers.Transaction.all/2
     end
 
@@ -22,6 +23,7 @@ defmodule ExchangerWeb.Queries.Transaction do
       arg :to_user_id, :id
       arg :to_wallet_id, :id
       arg :to_currency, :string
+      arg :type, :string
       resolve &Resolvers.Transaction.find/2
     end
   end

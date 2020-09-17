@@ -1,20 +1,20 @@
-defmodule ExchangerWeb.Queries.User do
+defmodule ExchangerWeb.Queries.Transaction do
   @moduledoc "Absinthe queries for users"
   use Absinthe.Schema.Notation
   alias ExchangerWeb.Resolvers
 
-  object :user_queries do
-    field :users, list_of(:user) do
+  object :transaction_queries do
+    field :transactions, list_of(:transaction) do
       arg :first_name, :string
       arg :last_name, :string
-      resolve &Resolvers.User.all/2
+      resolve &Resolvers.Transaction.all/2
     end
 
-    field :user, :user do
+    field :transaction, :transaction do
       arg :id, :id
       arg :first_name, :string
       arg :last_name, :string
-      resolve &Resolvers.User.find/2
+      resolve &Resolvers.Transaction.find/2
     end
   end
 end

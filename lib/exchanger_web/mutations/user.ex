@@ -5,17 +5,17 @@ defmodule ExchangerWeb.Mutations.User do
 
   object :user_mutations do
     field :create_user, :user do
-      arg(:first_name, :string)
-      arg(:last_name, :string)
-      resolve(&Resolvers.User.create/2)
+      arg :first_name, :string
+      arg :last_name, :string
+      resolve &Resolvers.User.create/2
     end
 
     field :update_user, :user do
-      arg(:id, :id)
-      arg(:first_name, :string)
-      arg(:last_name, :string)
+      arg :id, :id
+      arg :first_name, :string
+      arg :last_name, :string
 
-      resolve(&Resolvers.User.update/2)
+      resolve &Resolvers.User.update/2
     end
   end
 end

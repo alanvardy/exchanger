@@ -6,13 +6,14 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transaction(id: $id) {
         id
         inserted_at
+        type
       }
     }
   """
 
   @transactions_doc """
-    query allTransactions($from_wallet_id: ID) {
-      transactions(from_wallet_id: $from_wallet_id) {
+    query allTransactions($from_wallet_id: ID, $type: String) {
+      transactions(from_wallet_id: $from_wallet_id, type: $type) {
         id
       }
     }
@@ -71,6 +72,20 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transactions =
         @transactions_doc
         |> run_schema(%{"from_wallet_id" => from_wallet_id})
+        |> get_in(["transactions"])
+
+      transaction_id = Integer.to_string(transaction_id)
+
+      assert [%{"id" => ^transaction_id}] = transactions
+    end
+
+    test "Can get transactions by from_wallet_id and type", %{
+      transaction: %{id: transaction_id, type: type},
+      from_wallet: %{id: from_wallet_id}
+    } do
+      transactions =
+        @transactions_doc
+        |> run_schema(%{"from_wallet_id" => from_wallet_id, "type" => type})
         |> get_in(["transactions"])
 
       transaction_id = Integer.to_string(transaction_id)

@@ -5,6 +5,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
     query getTransaction($id: ID) {
       transaction(id: $id) {
         id
+        inserted_at
       }
     }
   """
@@ -50,6 +51,15 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
         |> get_in(["transaction", "id"])
 
       assert transaction_id === Integer.to_string(id)
+    end
+
+    test "Can get the inserted_at datetime", %{transaction: %{id: id, inserted_at: inserted_at}} do
+      timestamp =
+        @transaction_doc
+        |> run_schema(%{"id" => id})
+        |> get_in(["transaction", "inserted_at"])
+
+      assert timestamp === DateTime.to_iso8601(inserted_at)
     end
   end
 

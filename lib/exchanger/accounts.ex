@@ -171,18 +171,6 @@ defmodule Exchanger.Accounts do
     end
   end
 
-  defp atomize_type({:ok, %Transaction{type: type} = transaction}) do
-    %Transaction{transaction | type: String.to_existing_atom(type)}
-  end
-
-  defp atomize_type(%Transaction{type: type} = transaction) do
-    %Transaction{transaction | type: String.to_existing_atom(type)}
-  end
-
-  defp atomize_type({:error, message}) do
-    {:error, message}
-  end
-
   @spec create_deposit(wallet, currency, amount) :: change_tuple(transaction)
   def create_deposit(%Wallet{} = wallet, currency, amount) when currency in @currencies do
     wallet
@@ -205,5 +193,17 @@ defmodule Exchanger.Accounts do
       error ->
         error
     end
+  end
+
+  defp atomize_type({:ok, %Transaction{type: type} = transaction}) do
+    %Transaction{transaction | type: String.to_existing_atom(type)}
+  end
+
+  defp atomize_type(%Transaction{type: type} = transaction) do
+    %Transaction{transaction | type: String.to_existing_atom(type)}
+  end
+
+  defp atomize_type({:error, message}) do
+    {:error, message}
   end
 end

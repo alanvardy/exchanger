@@ -11,5 +11,11 @@ defmodule ExchangerWeb.Types.Wallet do
     field :balance, :integer
 
     field :user, :user, resolve: dataloader(Exchanger.Accounts, :user)
+
+    field :sent_transactions, list_of(:transaction),
+      resolve: dataloader(Exchanger.Accounts, :sent_transactions)
+
+    field :received_transactions, list_of(:transaction),
+      resolve: dataloader(Exchanger.Accounts, :received_transactions)
   end
 end

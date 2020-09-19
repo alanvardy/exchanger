@@ -10,7 +10,10 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
         wallets {
           id,
           currency,
-          balance
+          balance,
+          received_transactions {
+            id
+          }
         }
       }
     }
@@ -61,6 +64,32 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
 
       assert id === Integer.to_string(wallet.id)
       assert currency === wallet.currency
+    end
+
+    test "can get user with wallets and transactions", %{user: user} do
+      wallet = insert(:wallet, user_id: user.id)
+
+      transaction =
+        insert(:deposit,
+          to_user_id: user.id,
+          to_wallet_id: wallet.id,
+          to_currency: wallet.currency
+        )
+
+      wallets =
+        @user_doc
+        |> run_schema(%{"id" => user.id})
+        |> get_in(["user", "wallets"])
+
+      wallet_id = Integer.to_string(wallet.id)
+      transaction_id = Integer.to_string(transaction.id)
+
+      assert [
+               %{
+                 "id" => ^wallet_id,
+                 "received_transactions" => [%{"id" => ^transaction_id}]
+               }
+             ] = wallets
     end
   end
 

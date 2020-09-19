@@ -151,14 +151,36 @@ defmodule Exchanger.Accounts do
   @spec all_transactions(params) :: {:ok, [User.t()]} | {:error, binary}
   def all_transactions(params) do
     # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(Transaction, params)
-    result = Actions.all(from(u in Transaction), params)
-    {:ok, result}
+    from(u in Transaction)
+    |> Actions.all(params)
+    |> case do
+      {:error, message} -> {:error, message}
+      transactions -> {:ok, Enum.map(transactions, &atomize_type/1)}
+    end
   end
 
   @spec find_transaction(params) :: {:error, binary} | {:ok, User.t()}
   def find_transaction(params) do
     # Hard Dialyzer fail with Actions.find(Transaction, params)
-    from(u in Transaction) |> Actions.find(params)
+    from(u in Transaction)
+    |> Actions.find(params)
+    |> atomize_type()
+    |> case do
+      {:error, message} -> {:error, message}
+      transaction -> {:ok, transaction}
+    end
+  end
+
+  defp atomize_type({:ok, %Transaction{type: type} = transaction}) do
+    %Transaction{transaction | type: String.to_existing_atom(type)}
+  end
+
+  defp atomize_type(%Transaction{type: type} = transaction) do
+    %Transaction{transaction | type: String.to_existing_atom(type)}
+  end
+
+  defp atomize_type({:error, message}) do
+    {:error, message}
   end
 
   @spec create_deposit(wallet, currency, amount) :: change_tuple(transaction)

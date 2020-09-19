@@ -62,6 +62,15 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
 
       assert timestamp === DateTime.to_iso8601(inserted_at)
     end
+
+    test "Can get the transaction type", %{transaction: %{id: id, type: transaction_type}} do
+      type =
+        @transaction_doc
+        |> run_schema(%{"id" => id})
+        |> get_in(["transaction", "type"])
+
+      assert type === String.upcase(transaction_type)
+    end
   end
 
   describe "@transactions" do

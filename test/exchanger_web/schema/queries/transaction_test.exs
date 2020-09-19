@@ -101,5 +101,37 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
 
       assert [%{"id" => ^transaction_id}] = transactions
     end
+
+    @transactions_doc """
+      query allTransactions($start_date: String) {
+        transactions(start_date: $start_date) {
+          id
+        }
+      }
+    """
+
+    test "gets a transaction inserted_at before datetime", %{transaction: %{id: transaction_id}} do
+      now = DateTime.utc_now() |> DateTime.add(-5, :second) |> DateTime.to_iso8601()
+
+      transactions =
+        @transactions_doc
+        |> run_schema(%{"start_date" => now})
+        |> get_in(["transactions"])
+
+      transaction_id = Integer.to_string(transaction_id)
+
+      assert [%{"id" => ^transaction_id}] = transactions
+    end
+
+    test "doesnt get transaction inserted_at after datetime" do
+      now = DateTime.utc_now() |> DateTime.add(5, :second) |> DateTime.to_iso8601()
+
+      transactions =
+        @transactions_doc
+        |> run_schema(%{"start_date" => now})
+        |> get_in(["transactions"])
+
+      assert Enum.empty?(transactions)
+    end
   end
 end

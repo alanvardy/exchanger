@@ -12,6 +12,7 @@ defmodule ExchangerWeb.Queries.Transaction do
       arg :to_wallet_id, :id
       arg :to_currency, :string
       arg :type, :string
+      arg :start_date, :string
       resolve &Resolvers.Transaction.all/2
     end
 

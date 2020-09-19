@@ -2,6 +2,7 @@ defmodule ExchangerWeb.Schema do
   @moduledoc "Main schema for Absinthe"
   use Absinthe.Schema
 
+  import_types Absinthe.Type.Custom
   import_types(ExchangerWeb.Types.Balance)
   import_types(ExchangerWeb.Types.Transaction)
   import_types(ExchangerWeb.Types.User)
@@ -12,7 +13,6 @@ defmodule ExchangerWeb.Schema do
   import_types(ExchangerWeb.Queries.Wallet)
   import_types(ExchangerWeb.Mutations.User)
   import_types(ExchangerWeb.Mutations.Wallet)
-  import_types Absinthe.Type.Custom
 
   query do
     import_fields(:balance_queries)

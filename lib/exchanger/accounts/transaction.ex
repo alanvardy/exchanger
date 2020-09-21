@@ -4,10 +4,9 @@ defmodule Exchanger.Accounts.Transaction do
   alias Exchanger.Accounts.{TransactionError, User, Wallet}
 
   @deposit_attrs [:to_amount, :to_currency, :to_user_id, :to_wallet_id, :type]
-  @transfer_attrs @deposit_attrs ++
-                    [:from_currency, :from_amount, :exchange_rate, :from_user_id, :from_wallet_id]
+  @withdrawal_attrs [:from_amount, :from_currency, :from_user_id, :from_wallet_id, :type]
+  @transfer_attrs @deposit_attrs ++ @withdrawal_attrs ++ [:exchange_rate]
   @currencies Application.get_env(:exchanger, :currencies)
-  @types ["deposit", "withdrawal", "transfer"]
 
   @type wallet :: Wallet.t()
   @type changeset :: Ecto.Changeset.t()
@@ -35,58 +34,43 @@ defmodule Exchanger.Accounts.Transaction do
     timestamps()
   end
 
-  @spec create_deposit_changeset(wallet, currency, amount) :: changeset
-  def create_deposit_changeset(%Wallet{currency: currency} = wallet, currency, amount) do
-    %Wallet{id: id, user_id: user_id} = wallet
-
-    attrs = %{
-      to_user_id: user_id,
-      to_currency: currency,
-      to_amount: amount,
-      to_wallet_id: id,
-      type: "deposit"
-    }
-
+  @spec create_deposit_changeset(map) :: changeset
+  def create_deposit_changeset(attrs) do
     %__MODULE__{}
     |> cast(attrs, @deposit_attrs)
     |> validate_required(@deposit_attrs)
     |> validate_inclusion(:to_currency, @currencies)
     |> validate_number(:to_amount, greater_than_or_equal_to: @minimum_transfer)
     |> validate_number(:to_amount, less_than_or_equal_to: @maximum_transfer)
-    |> validate_inclusion(:type, @types)
+    |> validate_inclusion(:type, ["deposit"])
+  end
+
+  @spec create_withdrawal_changeset(map) :: changeset
+  def create_withdrawal_changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, @withdrawal_attrs)
+    |> validate_required(@withdrawal_attrs)
+    |> validate_inclusion(:from_currency, @currencies)
+    |> validate_number(:from_amount, greater_than_or_equal_to: @minimum_transfer)
+    |> validate_number(:from_amount, less_than_or_equal_to: @maximum_transfer)
+    |> validate_inclusion(:type, ["withdrawal"])
   end
 
   def create_deposit_changeset(%Wallet{id: id}, currency, _amount) do
     raise TransactionError, reason: :wrong_currency, currency: currency, wallet_id: id
   end
 
-  @spec create_transfer_changeset(wallet, wallet, amount, exchange_rate) :: changeset
-  def create_transfer_changeset(%Wallet{id: id}, _, nil, _) do
-    raise TransactionError, reason: :invalid_amount, amount: nil, wallet_id: id
+  @spec create_transfer_changeset(map) :: changeset
+  def create_transfer_changeset(%{to_wallet_id: to_wallet_id, to_amount: nil}) do
+    raise TransactionError, reason: :invalid_amount, amount: nil, wallet_id: to_wallet_id
   end
 
-  def create_transfer_changeset(from_wallet, to_wallet, amount, exchange_rate) do
-    %Wallet{id: from_wallet_id, user_id: from_user_id, currency: from_currency} = from_wallet
-    %Wallet{id: to_wallet_id, user_id: to_user_id, currency: to_currency} = to_wallet
-
-    attrs = %{
-      type: "transfer",
-      from_user_id: from_user_id,
-      from_wallet_id: from_wallet_id,
-      to_user_id: to_user_id,
-      to_wallet_id: to_wallet_id,
-      from_amount: amount,
-      from_currency: from_currency,
-      to_currency: to_currency,
-      exchange_rate: exchange_rate,
-      to_amount: trunc(amount * exchange_rate)
-    }
-
+  def create_transfer_changeset(attrs) do
     %__MODULE__{}
     |> cast(attrs, @transfer_attrs)
     |> validate_required(@transfer_attrs)
     |> validate_inclusion(:from_currency, @currencies)
     |> validate_inclusion(:to_currency, @currencies)
-    |> validate_inclusion(:type, @types)
+    |> validate_inclusion(:type, ["transfer"])
   end
 end

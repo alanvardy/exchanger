@@ -2,7 +2,7 @@ defmodule Exchanger.AccountsTest do
   use Exchanger.DataCase
 
   alias Exchanger.Accounts
-  alias Exchanger.Accounts.{Balance, Transaction, TransactionError, User, Wallet}
+  alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
   @currencies Application.get_env(:exchanger, :currencies)
 
@@ -37,27 +37,6 @@ defmodule Exchanger.AccountsTest do
       assert {:error, %Ecto.Changeset{}} =
                Accounts.create_user(params_for(:user, first_name: nil))
     end
-
-    # test "update_user/2 with valid data updates the user" do
-    #   user = insert(:user)
-    #   params = params_for(:user)
-    #   assert {:ok, %User{} = user} = Accounts.update_user(user, params)
-    #   assert user.first_name == params.first_name
-    #   assert user.last_name == params.last_name
-    # end
-
-    # test "update_user/2 with invalid data returns error changeset" do
-    #   user = insert(:user)
-    #   params = params_for(:user, first_name: "")
-    #   assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, params)
-    #   assert user == Accounts.get_user!(user.id)
-    # end
-
-    # test "delete_user/1 deletes the user" do
-    #   user = insert(:user)
-    #   assert {:ok, %User{}} = Accounts.delete_user(user)
-    #   assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
-    # end
   end
 
   describe "wallets" do
@@ -88,7 +67,7 @@ defmodule Exchanger.AccountsTest do
     end
   end
 
-  describe "create_deposit/3" do
+  describe "create_deposit/1" do
     test "with valid data creates a transaction" do
       wallet = insert(:wallet, user: build(:user))
       user_id = wallet.user_id
@@ -102,16 +81,30 @@ defmodule Exchanger.AccountsTest do
                 to_wallet_id: ^wallet_id,
                 from_user_id: nil,
                 from_wallet_id: nil
-              }} = Accounts.create_deposit(wallet, wallet.currency, 500)
+              }} =
+               Accounts.create_deposit(%{
+                 to_user_id: wallet.user_id,
+                 to_currency: wallet.currency,
+                 to_amount: 500
+               })
     end
 
     test "with invalid data returns error changeset" do
-      wallet = insert(:wallet)
-
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_deposit(wallet, wallet.currency, nil)
+      wallet = insert(:wallet, user: build(:user))
 
       assert {:error, %Ecto.Changeset{}} =
-               Accounts.create_deposit(wallet, wallet.currency, 1_000_000_000)
+               Accounts.create_deposit(%{
+                 to_user_id: wallet.user_id,
+                 to_currency: wallet.currency,
+                 to_amount: nil
+               })
+
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_deposit(%{
+                 to_user_id: wallet.user_id,
+                 to_currency: wallet.currency,
+                 to_amount: 1_000_000_000
+               })
     end
   end
 
@@ -126,11 +119,18 @@ defmodule Exchanger.AccountsTest do
       to_wallet = insert(:wallet, user: to_user, currency: "CAD")
       to_wallet_id = to_wallet.id
 
+      assert {:ok, _} =
+               Accounts.create_deposit(%{
+                 to_user_id: from_wallet.user_id,
+                 to_amount: 10_000,
+                 to_currency: "USD"
+               })
+
       assert {:ok,
               %Transaction{
                 type: "transfer",
-                from_amount: 1000,
-                to_amount: 1340,
+                from_amount: 746,
+                to_amount: 1000,
                 to_user_id: ^to_user_id,
                 from_user_id: ^from_user_id,
                 to_wallet_id: ^to_wallet_id,
@@ -138,10 +138,16 @@ defmodule Exchanger.AccountsTest do
                 from_currency: "USD",
                 to_currency: "CAD",
                 exchange_rate: 1.34
-              }} = Accounts.create_transfer(from_wallet, to_wallet, 1_000)
+              }} =
+               Accounts.create_transfer(%{
+                 from_wallet_id: from_wallet_id,
+                 to_user_id: to_user.id,
+                 to_currency: "CAD",
+                 to_amount: 1000
+               })
 
-      assert %Wallet{balance: 1340, updated_at: updated_at} = Accounts.get_wallet!(to_wallet_id)
-      assert %Wallet{balance: -1000} = Accounts.get_wallet!(from_wallet_id)
+      assert %Wallet{balance: 1000, updated_at: updated_at} = Accounts.get_wallet!(to_wallet_id)
+      assert %Wallet{balance: 9254} = Accounts.get_wallet!(from_wallet_id)
     end
 
     test "with same currencies creates a transaction" do
@@ -149,6 +155,14 @@ defmodule Exchanger.AccountsTest do
       from_user_id = from_user.id
       from_wallet = insert(:wallet, user: from_user, currency: "CAD")
       from_wallet_id = from_wallet.id
+
+      assert {:ok, _} =
+               Accounts.create_deposit(%{
+                 to_user_id: from_wallet.user_id,
+                 to_amount: 10_000,
+                 to_currency: "CAD"
+               })
+
       to_user = insert(:user)
       to_user_id = to_user.id
       to_wallet = insert(:wallet, user: to_user, currency: "CAD")
@@ -166,20 +180,27 @@ defmodule Exchanger.AccountsTest do
                 from_currency: "CAD",
                 to_currency: "CAD",
                 exchange_rate: 1.0
-              }} = Accounts.create_transfer(from_wallet, to_wallet, 3000)
-    end
-
-    test "with a nil amount raises an exception" do
-      assert_raise TransactionError, fn ->
-        Accounts.create_transfer(insert(:wallet), insert(:wallet), nil)
-      end
+              }} =
+               Accounts.create_transfer(%{
+                 from_wallet_id: from_wallet_id,
+                 to_user_id: to_user.id,
+                 to_currency: "CAD",
+                 to_amount: 3000
+               })
     end
   end
 
   describe "get_wallet_balance!/1" do
     test "can get a balance with a deposit" do
       wallet = insert(:wallet, currency: "USD", user: build(:user))
-      {:ok, %Transaction{}} = Accounts.create_deposit(wallet, "USD", 10_000)
+
+      {:ok, %Transaction{}} =
+        Accounts.create_deposit(%{
+          to_user_id: wallet.user_id,
+          to_currency: "USD",
+          to_amount: 10_000
+        })
+
       assert %Balance{amount: 10_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet)
     end
 
@@ -187,10 +208,36 @@ defmodule Exchanger.AccountsTest do
       wallet1 = insert(:wallet, currency: "USD", user: build(:user))
       wallet2 = insert(:wallet, currency: "USD", user: build(:user))
       wallet3 = insert(:wallet, currency: "USD", user: build(:user))
-      {:ok, %Transaction{}} = Accounts.create_deposit(wallet1, "USD", 10_000)
-      {:ok, %Transaction{}} = Accounts.create_deposit(wallet3, "USD", 10_000)
-      {:ok, %Transaction{}} = Accounts.create_transfer(wallet1, wallet2, 5_000)
-      {:ok, %Transaction{}} = Accounts.create_transfer(wallet3, wallet1, 3_000)
+
+      {:ok, %Transaction{}} =
+        Accounts.create_deposit(%{
+          to_user_id: wallet1.user_id,
+          to_currency: "USD",
+          to_amount: 10_000
+        })
+
+      {:ok, %Transaction{}} =
+        Accounts.create_deposit(%{
+          to_user_id: wallet3.user_id,
+          to_currency: "USD",
+          to_amount: 10_000
+        })
+
+      {:ok, %Transaction{}} =
+        Accounts.create_transfer(%{
+          from_wallet_id: wallet1.id,
+          to_user_id: wallet2.user_id,
+          to_currency: "USD",
+          to_amount: 5_000
+        })
+
+      {:ok, %Transaction{}} =
+        Accounts.create_transfer(%{
+          from_wallet_id: wallet3.id,
+          to_user_id: wallet1.user_id,
+          to_currency: "USD",
+          to_amount: 3_000
+        })
 
       assert %Balance{amount: 8_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet1)
       assert %Balance{amount: 5_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet2)

@@ -9,8 +9,8 @@ defmodule Exchanger.Helpers do
 
   @spec run_schema(String.t(), %{optional(String.t()) => any()}) :: any
   def run_schema(document, variables) do
-    assert {:ok, %{data: data}} = Absinthe.run(document, Schema, variables: variables)
-    data
+    assert {:ok, results} = Absinthe.run(document, Schema, variables: variables)
+    results
   end
 
   @doc """

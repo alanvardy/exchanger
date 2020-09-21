@@ -11,6 +11,7 @@ defmodule ExchangerWeb.Schema do
   import_types(ExchangerWeb.Queries.Transaction)
   import_types(ExchangerWeb.Queries.User)
   import_types(ExchangerWeb.Queries.Wallet)
+  import_types(ExchangerWeb.Mutations.Transaction)
   import_types(ExchangerWeb.Mutations.User)
   import_types(ExchangerWeb.Mutations.Wallet)
 
@@ -22,6 +23,7 @@ defmodule ExchangerWeb.Schema do
   end
 
   mutation do
+    import_fields(:transaction_mutations)
     import_fields(:user_mutations)
     import_fields(:wallet_mutations)
   end

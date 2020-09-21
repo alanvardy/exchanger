@@ -38,7 +38,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
       user_id =
         @user_doc
         |> run_schema(%{"first_name" => user.first_name, "last_name" => user.last_name})
-        |> get_in(["user", "id"])
+        |> get_in([:data, "user", "id"])
         |> String.to_integer()
 
       assert user_id === user.id
@@ -48,7 +48,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
       user_id =
         @user_doc
         |> run_schema(%{"id" => user.id})
-        |> get_in(["user", "id"])
+        |> get_in([:data, "user", "id"])
         |> String.to_integer()
 
       assert user_id === user.id
@@ -60,7 +60,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
       [%{"id" => id, "currency" => currency}] =
         @user_doc
         |> run_schema(%{"id" => user.id})
-        |> get_in(["user", "wallets"])
+        |> get_in([:data, "user", "wallets"])
 
       assert id === Integer.to_string(wallet.id)
       assert currency === wallet.currency
@@ -79,7 +79,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
       wallets =
         @user_doc
         |> run_schema(%{"id" => user.id})
-        |> get_in(["user", "wallets"])
+        |> get_in([:data, "user", "wallets"])
 
       wallet_id = Integer.to_string(wallet.id)
       transaction_id = Integer.to_string(transaction.id)
@@ -98,7 +98,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
       user_ids =
         @users_doc
         |> run_schema(%{"first_name" => user.first_name, "last_name" => user.last_name})
-        |> Map.get("users")
+        |> get_in([:data, "users"])
         |> Enum.map(&String.to_integer(&1["id"]))
 
       assert user_ids === [user.id]

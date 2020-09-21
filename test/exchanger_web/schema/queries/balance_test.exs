@@ -20,7 +20,7 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
       balance =
         @net_worth_doc
         |> run_schema(%{"user_id" => user.id, "currency" => "USD"})
-        |> get_in(["net_worth", "amount"])
+        |> get_in([:data, "net_worth", "amount"])
 
       assert balance === 0
     end
@@ -32,7 +32,7 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
       balance =
         @net_worth_doc
         |> run_schema(%{"user_id" => user.id, "currency" => "USD"})
-        |> get_in(["net_worth", "amount"])
+        |> get_in([:data, "net_worth", "amount"])
 
       assert balance === 10_000
     end
@@ -45,7 +45,7 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
       balance =
         @net_worth_doc
         |> run_schema(%{"user_id" => user.id, "currency" => "CAD"})
-        |> get_in(["net_worth", "amount"])
+        |> get_in([:data, "net_worth", "amount"])
 
       assert balance === 40_200
     end

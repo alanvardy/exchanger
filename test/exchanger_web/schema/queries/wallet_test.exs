@@ -37,7 +37,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
       wallet_id =
         @wallet_doc
         |> run_schema(%{"currency" => wallet.currency})
-        |> get_in(["wallet", "id"])
+        |> get_in([:data, "wallet", "id"])
         |> String.to_integer()
 
       assert wallet_id === wallet.id
@@ -47,7 +47,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
       user_id =
         @wallet_doc
         |> run_schema(%{"currency" => wallet.currency})
-        |> get_in(["wallet", "user", "id"])
+        |> get_in([:data, "wallet", "user", "id"])
         |> String.to_integer()
 
       assert user_id === user.id
@@ -57,7 +57,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
       wallet_id =
         @wallet_doc
         |> run_schema(%{"user_id" => user.id})
-        |> get_in(["wallet", "id"])
+        |> get_in([:data, "wallet", "id"])
         |> String.to_integer()
 
       assert wallet_id === wallet.id
@@ -71,7 +71,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
       wallet_ids =
         @wallets_doc
         |> run_schema(%{"user_id" => user.id})
-        |> Map.get("wallets")
+        |> get_in([:data, "wallets"])
         |> Enum.map(&String.to_integer(&1["id"]))
 
       assert Enum.sort(wallet_ids) === Enum.sort([wallet1.id, wallet2.id])

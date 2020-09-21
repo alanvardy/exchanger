@@ -171,27 +171,50 @@ defmodule Exchanger.Accounts do
     end
   end
 
-  @spec create_deposit(wallet, currency, amount) :: change_tuple(transaction)
-  def create_deposit(%Wallet{} = wallet, currency, amount) when currency in @currencies do
-    wallet
-    |> Transaction.create_deposit_changeset(currency, amount)
-    |> Repo.insert()
+  @spec create_deposit(map) :: change_tuple(transaction)
+  def create_deposit(params) do
+    with %{to_currency: currency, to_user_id: user_id} <- params,
+         {:ok, %Wallet{id: to_wallet_id}} <- find_wallet(%{user_id: user_id, currency: currency}) do
+      params
+      |> Map.merge(%{type: "deposit", to_wallet_id: to_wallet_id})
+      |> Transaction.create_deposit_changeset()
+      |> Repo.insert()
+    else
+      params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
+      {:error, _} -> {:error, "Wallet not found for currency"}
+    end
   end
 
-  @spec create_transfer(wallet, wallet, amount) ::
-          change_tuple(transaction) | {:error, :rate_not_found}
-  def create_transfer(from_wallet, to_wallet, amount) do
-    %Wallet{currency: from_currency} = from_wallet
-    %Wallet{currency: to_currency} = to_wallet
+  def create_withdrawal(_params) do
+    {:error, "not implemented"}
+  end
 
-    case ExchangeRate.fetch(from_currency, to_currency) do
-      {:ok, %{rate: rate}} ->
-        from_wallet
-        |> Transaction.create_transfer_changeset(to_wallet, amount, rate)
-        |> Repo.insert()
-
-      error ->
-        error
+  @spec create_transfer(map) :: change_tuple(transaction) | {:error, String.t()}
+  def create_transfer(params) do
+    with %{from_wallet_id: from_wallet_id, to_user_id: to_user_id} <- params,
+         %{to_currency: to_currency, to_amount: to_amount} <- params,
+         {:ok, to_wallet} <- find_wallet(%{user_id: to_user_id, currency: to_currency}),
+         %Wallet{id: to_wallet_id} <- to_wallet,
+         {:ok, from_wallet} <- find_wallet(%{id: from_wallet_id}),
+         %Wallet{user_id: from_user_id} <- from_wallet,
+         %Wallet{currency: from_currency, balance: from_balance} <- from_wallet,
+         {:ok, %{rate: rate}} <- ExchangeRate.fetch(from_currency, to_currency),
+         from_amount <- trunc(to_amount / rate),
+         true <- from_amount <= from_balance do
+      params
+      |> Map.put(:exchange_rate, rate)
+      |> Map.put(:to_wallet_id, to_wallet_id)
+      |> Map.put(:from_user_id, from_user_id)
+      |> Map.put(:from_currency, from_currency)
+      |> Map.put(:type, "transfer")
+      |> Map.put(:from_amount, from_amount)
+      |> Transaction.create_transfer_changeset()
+      |> Repo.insert()
+    else
+      false -> {:error, "Insufficient funds"}
+      params when is_map(params) -> {:error, "Invalid parameters for transfer"}
+      {:error, :rate_not_found} -> {:error, "Could not fetch exchange rate"}
+      {:error, error} -> {:error, "Wallet not found: #{error}"}
     end
   end
 

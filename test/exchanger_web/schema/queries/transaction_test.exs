@@ -49,7 +49,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transaction_id =
         @transaction_doc
         |> run_schema(%{"id" => id})
-        |> get_in(["transaction", "id"])
+        |> get_in([:data, "transaction", "id"])
 
       assert transaction_id === Integer.to_string(id)
     end
@@ -58,7 +58,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       timestamp =
         @transaction_doc
         |> run_schema(%{"id" => id})
-        |> get_in(["transaction", "inserted_at"])
+        |> get_in([:data, "transaction", "inserted_at"])
 
       assert timestamp === DateTime.to_iso8601(inserted_at)
     end
@@ -67,7 +67,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       type =
         @transaction_doc
         |> run_schema(%{"id" => id})
-        |> get_in(["transaction", "type"])
+        |> get_in([:data, "transaction", "type"])
 
       assert type === String.upcase(transaction_type)
     end
@@ -81,7 +81,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transactions =
         @transactions_doc
         |> run_schema(%{"from_wallet_id" => from_wallet_id})
-        |> get_in(["transactions"])
+        |> get_in([:data, "transactions"])
 
       transaction_id = Integer.to_string(transaction_id)
 
@@ -95,7 +95,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transactions =
         @transactions_doc
         |> run_schema(%{"from_wallet_id" => from_wallet_id, "type" => type})
-        |> get_in(["transactions"])
+        |> get_in([:data, "transactions"])
 
       transaction_id = Integer.to_string(transaction_id)
 
@@ -116,7 +116,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transactions =
         @transactions_doc
         |> run_schema(%{"start_date" => now})
-        |> get_in(["transactions"])
+        |> get_in([:data, "transactions"])
 
       transaction_id = Integer.to_string(transaction_id)
 
@@ -129,7 +129,7 @@ defmodule ExchangerWeb.Schema.Queries.TransactionTest do
       transactions =
         @transactions_doc
         |> run_schema(%{"start_date" => now})
-        |> get_in(["transactions"])
+        |> get_in([:data, "transactions"])
 
       assert Enum.empty?(transactions)
     end

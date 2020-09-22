@@ -48,6 +48,93 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
     end
   end
 
+  @create_withdrawal_doc """
+    mutation createWithdrawal($from_user_id: ID, $from_amount: Int, $from_currency: String) {
+      create_withdrawal(from_user_id: $from_user_id, from_amount: $from_amount, from_currency: $from_currency) {
+        id
+      }
+    }
+  """
+
+  describe "@create_withdrawal" do
+    test "creates a withdrawal" do
+      currency = "USD"
+      user = insert(:user)
+      from_wallet = insert(:wallet, user: user, currency: currency)
+
+      assert {:ok, _} =
+               Accounts.create_deposit(%{
+                 to_user_id: from_wallet.user_id,
+                 to_amount: 10_000,
+                 to_currency: currency
+               })
+
+      assert {:ok, %Balance{amount: 10_000}} = Accounts.fetch_user_balance(user.id, currency)
+
+      assert %{data: %{"create_withdrawal" => %{"id" => _}}} =
+               run_schema(@create_withdrawal_doc, %{
+                 "from_currency" => currency,
+                 "from_user_id" => from_wallet.user_id,
+                 "from_amount" => 5_000
+               })
+
+      {:ok, transactions} = Accounts.all_transactions(%{})
+      assert Enum.count(transactions) == 2
+
+      assert {:ok, %Balance{amount: 5_000}} = Accounts.fetch_user_balance(user.id, currency)
+    end
+
+    test "won't create a withdrawal in a currency where the user does not have a wallet" do
+      user = insert(:user)
+      from_wallet = insert(:wallet, user: user, currency: "USD")
+
+      assert {:ok, _} =
+               Accounts.create_deposit(%{
+                 to_user_id: from_wallet.user_id,
+                 to_amount: 10_000,
+                 to_currency: from_wallet.currency
+               })
+
+      assert %{errors: [%{message: "Wallet not found for currency"}]} =
+               run_schema(@create_withdrawal_doc, %{
+                 "from_currency" => "CAD",
+                 "from_user_id" => user.id,
+                 "from_amount" => 5_000
+               })
+
+      {:ok, transactions} = Accounts.all_transactions(%{})
+      assert Enum.count(transactions) == 1
+
+      assert {:ok, %Balance{amount: 10_000}} =
+               Accounts.fetch_user_balance(user.id, from_wallet.currency)
+    end
+
+    test "will not overdraw wallet" do
+      user = insert(:user)
+      from_wallet = insert(:wallet, user: user, currency: "USD")
+
+      assert {:ok, _} =
+               Accounts.create_deposit(%{
+                 to_user_id: from_wallet.user_id,
+                 to_amount: 10_000,
+                 to_currency: from_wallet.currency
+               })
+
+      assert %{errors: [%{message: "Insufficient funds"}]} =
+               run_schema(@create_withdrawal_doc, %{
+                 "from_currency" => from_wallet.currency,
+                 "from_user_id" => user.id,
+                 "from_amount" => 20_000
+               })
+
+      {:ok, transactions} = Accounts.all_transactions(%{})
+      assert Enum.count(transactions) == 1
+
+      assert {:ok, %Balance{amount: 10_000}} =
+               Accounts.fetch_user_balance(user.id, from_wallet.currency)
+    end
+  end
+
   @create_transfer_doc """
     mutation createTransfer($to_user_id: ID, $to_amount: Int, $to_currency: String, $from_wallet_id: ID) {
       create_transfer(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency, from_wallet_id: $from_wallet_id) {

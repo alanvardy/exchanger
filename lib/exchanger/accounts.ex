@@ -185,8 +185,22 @@ defmodule Exchanger.Accounts do
     end
   end
 
-  def create_withdrawal(_params) do
-    {:error, "not implemented"}
+  @spec create_withdrawal(map) :: change_tuple(transaction)
+  def create_withdrawal(params) do
+    with %{from_currency: currency, from_user_id: user_id} <- params,
+         %{from_amount: from_amount} <- params,
+         {:ok, wallet} <- find_wallet(%{user_id: user_id, currency: currency}),
+         %Wallet{id: from_wallet_id, balance: balance} <- wallet,
+         true <- from_amount <= balance do
+      params
+      |> Map.merge(%{type: "withdrawal", from_wallet_id: from_wallet_id})
+      |> Transaction.create_withdrawal_changeset()
+      |> Repo.insert()
+    else
+      params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
+      {:error, _} -> {:error, "Wallet not found for currency"}
+      false -> {:error, "Insufficient funds"}
+    end
   end
 
   @spec create_transfer(map) :: change_tuple(transaction) | {:error, String.t()}

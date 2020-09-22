@@ -5,8 +5,8 @@ defmodule ExchangerWeb.Mutations.Wallet do
 
   object :wallet_mutations do
     field :create_wallet, :wallet do
-      arg :user_id, :id
-      arg :currency, :string
+      arg :user_id, non_null(:id)
+      arg :currency, non_null(:string)
       resolve &Resolvers.Wallet.create/2
     end
   end

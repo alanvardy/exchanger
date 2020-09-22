@@ -132,7 +132,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       deposit_in_wallet(from_wallet, 10_000)
 
-      to_wallet = insert(:wallet, user: build(:user))
+      to_wallet = insert(:wallet, user: build(:user), currency: "USD")
 
       assert {:ok, %Balance{amount: 10_000}} =
                Accounts.fetch_user_balance(from_wallet.user_id, currency)

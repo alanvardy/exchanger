@@ -3,9 +3,9 @@ defmodule Exchanger.Helpers do
   Test helpers, imported into all test files
   """
   import ExUnit.Assertions
-  alias ExchangerWeb.Schema
   alias Exchanger.Accounts
   alias Exchanger.Accounts.Wallet
+  alias ExchangerWeb.Schema
 
   @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
 
@@ -15,7 +15,8 @@ defmodule Exchanger.Helpers do
     results
   end
 
-  @spec deposit_in_wallet(Exchanger.Accounts.Wallet.t(), any) :: {:ok, Exchanger.Accounts.Transaction.t()}
+  @spec deposit_in_wallet(Exchanger.Accounts.Wallet.t(), any) ::
+          {:ok, Exchanger.Accounts.Transaction.t()}
   def deposit_in_wallet(%Wallet{user_id: user_id, currency: currency}, amount) do
     assert {:ok, _} =
              Accounts.create_deposit(%{

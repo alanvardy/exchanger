@@ -9,13 +9,13 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
     [user: user, wallet: wallet]
   end
 
-    @create_deposit_doc """
-      mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
-        create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
-          id
-        }
+  @create_deposit_doc """
+    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
+      create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
+        id
       }
-    """
+    }
+  """
 
   describe "@create_deposit" do
     test "creates a deposit", %{user: user, wallet: wallet} do

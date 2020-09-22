@@ -92,14 +92,14 @@ defmodule Exchanger.AccountsTest do
     test "with invalid data returns error changeset" do
       wallet = insert(:wallet, user: build(:user))
 
-      assert {:error, %Ecto.Changeset{}} =
+      assert {:error, "to_amount: can't be blank"} =
                Accounts.create_deposit(%{
                  to_user_id: wallet.user_id,
                  to_currency: wallet.currency,
                  to_amount: nil
                })
 
-      assert {:error, %Ecto.Changeset{}} =
+      assert {:error, "to_amount: must be less than or equal to 100000000"} =
                Accounts.create_deposit(%{
                  to_user_id: wallet.user_id,
                  to_currency: wallet.currency,

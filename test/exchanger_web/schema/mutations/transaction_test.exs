@@ -49,6 +49,23 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(user.id, wallet.currency)
     end
+
+    test "returns changeset error when over deposit limit", %{
+      user: user,
+      wallet: wallet
+    } do
+      assert %{errors: [%{message: "to_amount: must be less than or equal to 100000000"}]} =
+               run_schema(@create_deposit_doc, %{
+                 "to_currency" => "USD",
+                 "to_user_id" => user.id,
+                 "to_amount" => 10_000_000_000_000
+               })
+
+      {:ok, transactions} = Accounts.all_transactions(%{})
+      assert Enum.empty?(transactions)
+
+      assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(user.id, wallet.currency)
+    end
   end
 
   @create_withdrawal_doc """

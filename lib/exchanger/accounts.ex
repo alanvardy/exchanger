@@ -5,15 +5,16 @@ defmodule Exchanger.Accounts do
 
   import Ecto.Query, warn: false
   alias EctoShorts.Actions
+  alias Ecto.Changeset
   alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
   @type response(data) :: {:ok, data} | {:error, :wallet_not_found}
-  @type change_tuple(struct) :: {:ok, struct} | {:error, Ecto.Changeset.t()}
+  @type change_tuple(struct) :: {:ok, struct} | {:error, Changeset.t()}
   @type user :: User.t()
   @type wallet :: Wallet.t()
   @type transaction :: Transaction.t()
-  @type changeset :: Ecto.Changeset.t()
+  @type changeset :: Changeset.t()
   @type id :: pos_integer
   @type amount :: pos_integer
   @type exchange_rate :: float
@@ -57,12 +58,12 @@ defmodule Exchanger.Accounts do
     end
   end
 
-  @spec create_user(params) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  @spec create_user(params) :: {:error, Changeset.t()} | {:ok, User.t()}
   def create_user(params) do
     Actions.create(User, params)
   end
 
-  @spec update_user(%{id: binary}) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  @spec update_user(%{id: binary}) :: {:error, Changeset.t()} | {:ok, User.t()}
   def update_user(%{id: id} = params) do
     with {:ok, user} <- find_user(%{id: String.to_integer(id)}) do
       params = Map.delete(params, :id)
@@ -179,6 +180,7 @@ defmodule Exchanger.Accounts do
       |> Map.merge(%{type: "deposit", to_wallet_id: to_wallet_id})
       |> Transaction.create_deposit_changeset()
       |> Repo.insert()
+      |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
       {:error, _} -> {:error, "Wallet not found for currency"}
@@ -196,6 +198,7 @@ defmodule Exchanger.Accounts do
       |> Map.merge(%{type: "withdrawal", from_wallet_id: from_wallet_id})
       |> Transaction.create_withdrawal_changeset()
       |> Repo.insert()
+      |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
       {:error, _} -> {:error, "Wallet not found for currency"}
@@ -224,6 +227,7 @@ defmodule Exchanger.Accounts do
       |> Map.put(:from_amount, from_amount)
       |> Transaction.create_transfer_changeset()
       |> Repo.insert()
+      |> maybe_format_changeset_errors()
     else
       false -> {:error, "Insufficient funds"}
       params when is_map(params) -> {:error, "Invalid parameters for transfer"}
@@ -242,5 +246,24 @@ defmodule Exchanger.Accounts do
 
   defp atomize_type({:error, message}) do
     {:error, message}
+  end
+
+  defp maybe_format_changeset_errors({:error, %Changeset{} = changeset}) do
+    errors =
+      Changeset.traverse_errors(changeset, fn {msg, opts} ->
+        Enum.reduce(opts, msg, fn {key, value}, acc ->
+          String.replace(acc, "%{#{key}}", to_string(value))
+        end)
+      end)
+      |> Enum.reduce("", fn {k, v}, acc ->
+        joined_errors = Enum.join(v, "; ")
+        "#{acc}#{k}: #{joined_errors}"
+      end)
+
+    {:error, errors}
+  end
+
+  defp maybe_format_changeset_errors({:ok, struct}) do
+    {:ok, struct}
   end
 end

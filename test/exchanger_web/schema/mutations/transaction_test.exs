@@ -3,19 +3,22 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   alias Exchanger.Accounts
   alias Exchanger.Accounts.Balance
 
-  @create_deposit_doc """
-    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
-      create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
-        id
+  setup do
+    user = insert(:user)
+    wallet = insert(:wallet, user: user, currency: "USD")
+    [user: user, wallet: wallet]
+  end
+
+    @create_deposit_doc """
+      mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
+        create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
+          id
+        }
       }
-    }
-  """
+    """
 
   describe "@create_deposit" do
-    test "creates a deposit" do
-      user = insert(:user)
-      wallet = insert(:wallet, user: user)
-
+    test "creates a deposit", %{user: user, wallet: wallet} do
       assert %{data: %{"create_deposit" => %{"id" => _}}} =
                run_schema(@create_deposit_doc, %{
                  "to_currency" => wallet.currency,
@@ -30,10 +33,10 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
                Accounts.fetch_user_balance(user.id, wallet.currency)
     end
 
-    test "won't create a deposit in a currency where the user does not have a wallet" do
-      user = insert(:user)
-      wallet = insert(:wallet, user: user, currency: "USD")
-
+    test "won't create a deposit in a currency where the user does not have a wallet", %{
+      user: user,
+      wallet: wallet
+    } do
       assert %{errors: [%{message: "Wallet not found for currency"}]} =
                run_schema(@create_deposit_doc, %{
                  "to_currency" => "CAD",
@@ -57,17 +60,10 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   """
 
   describe "@create_withdrawal" do
-    test "creates a withdrawal" do
+    test "creates a withdrawal", %{user: user, wallet: from_wallet} do
       currency = "USD"
-      user = insert(:user)
-      from_wallet = insert(:wallet, user: user, currency: currency)
 
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 10_000,
-                 to_currency: currency
-               })
+      deposit_in_wallet(from_wallet, 10_000)
 
       assert {:ok, %Balance{amount: 10_000}} = Accounts.fetch_user_balance(user.id, currency)
 
@@ -84,16 +80,11 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
       assert {:ok, %Balance{amount: 5_000}} = Accounts.fetch_user_balance(user.id, currency)
     end
 
-    test "won't create a withdrawal in a currency where the user does not have a wallet" do
-      user = insert(:user)
-      from_wallet = insert(:wallet, user: user, currency: "USD")
-
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 10_000,
-                 to_currency: from_wallet.currency
-               })
+    test "won't create a withdrawal in a currency where the user does not have a wallet", %{
+      user: user,
+      wallet: from_wallet
+    } do
+      deposit_in_wallet(from_wallet, 10_000)
 
       assert %{errors: [%{message: "Wallet not found for currency"}]} =
                run_schema(@create_withdrawal_doc, %{
@@ -109,16 +100,8 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
                Accounts.fetch_user_balance(user.id, from_wallet.currency)
     end
 
-    test "will not overdraw wallet" do
-      user = insert(:user)
-      from_wallet = insert(:wallet, user: user, currency: "USD")
-
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 10_000,
-                 to_currency: from_wallet.currency
-               })
+    test "will not overdraw wallet", %{user: user, wallet: from_wallet} do
+      deposit_in_wallet(from_wallet, 10_000)
 
       assert %{errors: [%{message: "Insufficient funds"}]} =
                run_schema(@create_withdrawal_doc, %{
@@ -144,16 +127,10 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   """
 
   describe "@create_transfer" do
-    test "creates a transfer" do
+    test "creates a transfer", %{wallet: from_wallet} do
       currency = "USD"
-      from_wallet = insert(:wallet, user: build(:user), currency: currency)
 
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 10_000,
-                 to_currency: currency
-               })
+      deposit_in_wallet(from_wallet, 10_000)
 
       to_wallet = insert(:wallet, user: build(:user))
 
@@ -180,27 +157,20 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
                Accounts.fetch_user_balance(to_wallet.user_id, currency)
     end
 
-    test "can transfer across currencies" do
-      from_wallet = insert(:wallet, user: build(:user), currency: "CAD")
+    test "can transfer across currencies", %{wallet: from_wallet} do
+      deposit_in_wallet(from_wallet, 10_000)
 
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 10_000,
-                 to_currency: "CAD"
-               })
-
-      to_wallet = insert(:wallet, user: build(:user), currency: "USD")
+      to_wallet = insert(:wallet, user: build(:user), currency: "CAD")
 
       assert {:ok, %Balance{amount: 10_000}} =
-               Accounts.fetch_user_balance(from_wallet.user_id, "CAD")
+               Accounts.fetch_user_balance(from_wallet.user_id, "USD")
 
-      assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, "USD")
+      assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, "CAD")
 
       assert %{data: %{"create_transfer" => %{"id" => _}}} =
                run_schema(@create_transfer_doc, %{
                  "to_user_id" => to_wallet.user_id,
-                 "to_currency" => "USD",
+                 "to_currency" => "CAD",
                  "to_amount" => 6_000,
                  "from_wallet_id" => from_wallet.id
                })
@@ -208,23 +178,17 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
       {:ok, transactions} = Accounts.all_transactions(%{})
       assert Enum.count(transactions) == 2
 
-      assert {:ok, %Balance{amount: 2_000}} =
-               Accounts.fetch_user_balance(from_wallet.user_id, "CAD")
+      assert {:ok, %Balance{amount: 5_523}} =
+               Accounts.fetch_user_balance(from_wallet.user_id, "USD")
 
       assert {:ok, %Balance{amount: 6_000}} =
-               Accounts.fetch_user_balance(to_wallet.user_id, "USD")
+               Accounts.fetch_user_balance(to_wallet.user_id, "CAD")
     end
 
-    test "cannot transfer if insufficient funds" do
+    test "cannot transfer if insufficient funds", %{wallet: from_wallet} do
       currency = "USD"
-      from_wallet = insert(:wallet, user: build(:user), currency: currency)
 
-      assert {:ok, _} =
-               Accounts.create_deposit(%{
-                 to_user_id: from_wallet.user_id,
-                 to_amount: 5_000,
-                 to_currency: currency
-               })
+      deposit_in_wallet(from_wallet, 5_000)
 
       to_wallet = insert(:wallet, user: build(:user), currency: "USD")
 

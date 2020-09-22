@@ -4,6 +4,8 @@ defmodule Exchanger.Helpers do
   """
   import ExUnit.Assertions
   alias ExchangerWeb.Schema
+  alias Exchanger.Accounts
+  alias Exchanger.Accounts.Wallet
 
   @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
 
@@ -11,6 +13,16 @@ defmodule Exchanger.Helpers do
   def run_schema(document, variables) do
     assert {:ok, results} = Absinthe.run(document, Schema, variables: variables)
     results
+  end
+
+  @spec deposit_in_wallet(Exchanger.Accounts.Wallet.t(), any) :: {:ok, Exchanger.Accounts.Transaction.t()}
+  def deposit_in_wallet(%Wallet{user_id: user_id, currency: currency}, amount) do
+    assert {:ok, _} =
+             Accounts.create_deposit(%{
+               to_user_id: user_id,
+               to_amount: amount,
+               to_currency: currency
+             })
   end
 
   @doc """

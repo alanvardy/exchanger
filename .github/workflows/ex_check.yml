@@ -1,0 +1,43 @@
+
+name: ex_check
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+
+    services:
+      db:
+        image: postgres:11.6
+        ports: ['6000:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+      alphavantage:
+        image: mikaak/alpha-vantage
+        ports: ['4001:4000']
+
+    steps:
+      - uses: actions/checkout@v1.0.0
+      - uses: actions/cache@v1
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-ex_check-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-ex_check-
+      - uses: actions/cache@v1
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-ex_check-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-ex_check-
+      - run: cp config/dev.exs.example config/dev.exs
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: 22.3.4
+          elixir-version: 1.10.3
+      - run: mix deps.get
+      - run: MIX_ENV=dev mix check

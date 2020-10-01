@@ -34,7 +34,6 @@ jobs:
           key: ${{ runner.os }}-build-ex_check-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-ex_check-
-      - run: cp config/dev.exs.example config/dev.exs
       - uses: actions/setup-elixir@v1.0.0
         with:
           otp-version: 22.3.4

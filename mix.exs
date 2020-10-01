@@ -42,11 +42,11 @@ defmodule Exchanger.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.4"},
+      {:phoenix, "~> 1.5.5"},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_ecto, "~> 4.0"},
+      {:phoenix_ecto, "~> 4.2"},
       {:ecto_sql, "~> 3.4.5"},
-      {:postgrex, ">= 0.0.0"},
+      {:postgrex, "~> 0.15.6"},
       {:gettext, "~> 0.18.1"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
@@ -55,6 +55,7 @@ defmodule Exchanger.MixProject do
       {:typed_struct, "~> 0.2.1"},
       {:absinthe, github: "alanvardy/absinthe", branch: "add_dataloader/2_spec", override: true},
       {:absinthe_plug, "~> 1.5.0"},
+      {:absinthe_phoenix, "~> 2.0"},
       {:dataloader, "~> 1.0"},
       {:ecto_shorts, github: "alanvardy/ecto_shorts", branch: "master"},
       {:timex, "~> 3.5"},

@@ -17,7 +17,8 @@ defmodule Exchanger.Application do
       # Start the Ecto repository
       Exchanger.Repo,
       # Start the endpoint when the application starts
-      ExchangerWeb.Endpoint
+      ExchangerWeb.Endpoint,
+      {Absinthe.Subscription, [ExchangerWeb.Endpoint]}
       # Starts a worker by calling: Exchanger.Worker.start_link(arg)
       # {Exchanger.Worker, arg},
     ]

@@ -2,6 +2,7 @@ defmodule Exchanger.ExchangeRate.Updater do
   @moduledoc "Periodically polls the exchange rate API and updates Store"
   use GenServer
   alias Exchanger.ExchangeRate.{Client, Store}
+  alias ExchangerWeb.ExchangeRateChannel
   require Logger
 
   @time_between_requests Application.get_env(:exchanger, :currency_refresh)
@@ -36,8 +37,13 @@ defmodule Exchanger.ExchangeRate.Updater do
   defp update_rates(currencies) do
     for from_currency <- currencies, to_currency <- currencies, from_currency != to_currency do
       case Client.get_rate(from_currency, to_currency) do
-        {:ok, rate} -> Store.update(rate)
-        {:error, message} -> Logger.error("Could not get rate: #{message}")
+        {:ok, rate} ->
+          rate
+          |> Store.update()
+          |> ExchangeRateChannel.publish()
+
+        {:error, message} ->
+          Logger.error("Could not get rate: #{message}")
       end
 
       :timer.sleep(@time_between_requests)

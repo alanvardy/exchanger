@@ -1,6 +1,7 @@
 defmodule Exchanger.ExchangeRate.Store do
   @moduledoc "Stores exchange rates as a map"
   use Agent
+  alias Exchanger.ExchangeRate.ExchangeRate
 
   @type currency :: String.t()
   @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
@@ -20,8 +21,10 @@ defmodule Exchanger.ExchangeRate.Store do
     end
   end
 
-  @spec update(map) :: :ok
-  def update(%{currencies: {from, to}, rate: rate, updated: updated}) do
+  @spec update(ExchangeRate.t()) :: ExchangeRate.t()
+  def update(%ExchangeRate{from: from, to: to, rate: rate, updated: updated} = exchange_rate) do
     Agent.update(__MODULE__, &Map.put(&1, from <> to, %{rate: rate, updated: updated}))
+
+    exchange_rate
   end
 end

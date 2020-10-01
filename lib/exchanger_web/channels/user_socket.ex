@@ -1,6 +1,11 @@
 defmodule ExchangerWeb.UserSocket do
   use Phoenix.Socket
 
+  use Absinthe.Phoenix.Socket,
+    schema: ExchangerWeb.Schema
+
+  channel "exchange_rate", ExchangerWeb.ExchangeRateChannel
+
   ## Channels
   # channel "room:*", ExchangerWeb.RoomChannel
 

@@ -4,8 +4,8 @@ defmodule Exchanger.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias EctoShorts.Actions
   alias Ecto.Changeset
+  alias EctoShorts.Actions
   alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 

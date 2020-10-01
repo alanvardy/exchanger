@@ -1,5 +1,6 @@
 defmodule ExchangerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :exchanger
+  use Absinthe.Phoenix.Endpoint
 
   socket "/socket", ExchangerWeb.UserSocket,
     websocket: true,

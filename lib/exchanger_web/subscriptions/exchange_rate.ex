@@ -7,17 +7,14 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRate do
       arg :currency, :string
 
       config fn
-        %{currency: currency}, _ when is_bitstring(currency) ->
+        %{currency: currency}, _res when is_bitstring(currency) ->
           {:ok, topic: "exchange_rate:#{currency}"}
 
-        _args, _ ->
+        _args, _res ->
           {:ok, topic: "exchange_rate:all"}
       end
 
-      # trigger :exchange_rate_updated,
-      #   topic: fn _exchange_rate -> "exchange_rate" end
-
-      resolve fn exchange_rate, _, _ -> {:ok, exchange_rate} end
+      resolve fn exchange_rate, _args, _res -> {:ok, exchange_rate} end
     end
   end
 end

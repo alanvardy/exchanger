@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Exchanger.ExchangeRate.Client.Local do
   @moduledoc "For querying the exchange rate api"
   @behaviour Exchanger.ExchangeRate.Client.Behaviour

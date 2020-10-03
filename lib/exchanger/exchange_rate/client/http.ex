@@ -1,7 +1,7 @@
 defmodule Exchanger.ExchangeRate.Client.Http do
   @moduledoc "For querying the exchange rate api"
-  alias HTTPoison.Response
   @behaviour Exchanger.ExchangeRate.Client.Behaviour
+  alias HTTPoison.Response
 
   @type currency :: String.t()
 

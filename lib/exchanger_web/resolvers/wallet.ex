@@ -7,17 +7,17 @@ defmodule ExchangerWeb.Resolvers.Wallet do
   @type params :: keyword | map
 
   @spec find(params, any) :: {:error, binary} | {:ok, Wallet.t()}
-  def find(params, _) do
+  def find(params, _res) do
     Accounts.find_wallet(params)
   end
 
   @spec all(params, any) :: {:ok, [User.t()]} | {:error, binary}
-  def all(params, _) do
+  def all(params, _res) do
     Accounts.all_wallets(params)
   end
 
   @spec create(params, any) :: {:error, Ecto.Changeset.t()} | {:ok, Wallet.t()}
-  def create(params, _) do
+  def create(params, _res) do
     Accounts.create_wallet(params)
   end
 end

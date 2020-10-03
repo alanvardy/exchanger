@@ -7,7 +7,7 @@ defmodule Exchanger.ExchangeRate.Store do
   @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 
   @spec start_link(any) :: {:error, any} | {:ok, pid}
-  def start_link(_) do
+  def start_link(_opts) do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
 
@@ -16,8 +16,8 @@ defmodule Exchanger.ExchangeRate.Store do
 
   def fetch_rate(from, to) do
     case Agent.get(__MODULE__, &Map.get(&1, from <> to)) do
-      %{rate: _, updated: _} = data -> {:ok, data}
-      _ -> {:error, :rate_not_found}
+      %{rate: _rate, updated: _updated} = data -> {:ok, data}
+      _error -> {:error, :rate_not_found}
     end
   end
 

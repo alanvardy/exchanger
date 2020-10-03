@@ -56,6 +56,7 @@ defmodule Exchanger.Accounts.Transaction do
     |> validate_inclusion(:type, ["withdrawal"])
   end
 
+  @spec create_deposit_changeset(wallet, currency, amount) :: changeset
   def create_deposit_changeset(%Wallet{id: id}, currency, _amount) do
     raise TransactionError, reason: :wrong_currency, currency: currency, wallet_id: id
   end

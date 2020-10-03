@@ -13,7 +13,7 @@ defmodule ExchangerWeb.UserChannel do
   end
 
   @spec join(binary, map, Phoenix.Socket.t()) :: {:ok, Phoenix.Socket.t()}
-  def join(_, _payload, socket) do
+  def join(_channel, _payload, socket) do
     {:ok, socket}
   end
 end

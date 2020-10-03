@@ -1,6 +1,6 @@
 defmodule Exchanger.Schema do
   @moduledoc "Common dependencies for schemas"
-  defmacro __using__(_) do
+  defmacro __using__(_opts) do
     quote do
       use TypedEctoSchema
       import Ecto.Query, warn: false

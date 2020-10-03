@@ -18,7 +18,7 @@ defmodule Exchanger.Helpers do
   @spec deposit_in_wallet(Exchanger.Accounts.Wallet.t(), any) ::
           {:ok, Exchanger.Accounts.Transaction.t()}
   def deposit_in_wallet(%Wallet{user_id: user_id, currency: currency}, amount) do
-    assert {:ok, _} =
+    assert {:ok, _transaction} =
              Accounts.create_deposit(%{
                to_user_id: user_id,
                to_amount: amount,
@@ -40,7 +40,7 @@ defmodule Exchanger.Helpers do
     assert_comparable(tail1, tail2)
   end
 
-  def assert_comparable(%_{} = struct, map) do
+  def assert_comparable(%_struct{} = struct, map) do
     comparables = get_comparables(struct)
 
     new_map =
@@ -53,7 +53,8 @@ defmodule Exchanger.Helpers do
     assert old_map == new_map
   end
 
-  def assert_comparable(map, %_{} = struct) when is_map(map), do: assert_comparable(struct, map)
+  def assert_comparable(map, %_struct{} = struct) when is_map(map),
+    do: assert_comparable(struct, map)
 
   # Returns a list of values to compare by
   @spec get_comparables(map) :: [atom]

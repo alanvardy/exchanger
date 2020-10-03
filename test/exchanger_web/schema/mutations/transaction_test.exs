@@ -19,7 +19,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
   describe "@create_deposit" do
     test "creates a deposit", %{user: user, wallet: wallet} do
-      assert %{data: %{"create_deposit" => %{"id" => _}}} =
+      assert %{data: %{"create_deposit" => %{"id" => _id}}} =
                run_schema(@create_deposit_doc, %{
                  "to_currency" => wallet.currency,
                  "to_user_id" => user.id,
@@ -84,7 +84,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert {:ok, %Balance{amount: 10_000}} = Accounts.fetch_user_balance(user.id, currency)
 
-      assert %{data: %{"create_withdrawal" => %{"id" => _}}} =
+      assert %{data: %{"create_withdrawal" => %{"id" => _id}}} =
                run_schema(@create_withdrawal_doc, %{
                  "from_currency" => currency,
                  "from_user_id" => from_wallet.user_id,
@@ -156,7 +156,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, currency)
 
-      assert %{data: %{"create_transfer" => %{"id" => _}}} =
+      assert %{data: %{"create_transfer" => %{"id" => _id}}} =
                run_schema(@create_transfer_doc, %{
                  "to_user_id" => to_wallet.user_id,
                  "to_currency" => currency,
@@ -184,7 +184,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, "CAD")
 
-      assert %{data: %{"create_transfer" => %{"id" => _}}} =
+      assert %{data: %{"create_transfer" => %{"id" => _id}}} =
                run_schema(@create_transfer_doc, %{
                  "to_user_id" => to_wallet.user_id,
                  "to_currency" => "CAD",

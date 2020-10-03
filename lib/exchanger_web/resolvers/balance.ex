@@ -7,7 +7,7 @@ defmodule ExchangerWeb.Resolvers.Balance do
   @type params :: keyword | map
 
   @spec get_net_worth(params, any) :: {:ok, Balance.t()} | {:error, binary}
-  def get_net_worth(%{user_id: user_id, currency: currency}, _) do
+  def get_net_worth(%{user_id: user_id, currency: currency}, _res) do
     Accounts.fetch_user_balance(user_id, currency)
   end
 end

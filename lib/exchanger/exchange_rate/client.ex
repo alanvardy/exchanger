@@ -2,9 +2,10 @@ defmodule Exchanger.ExchangeRate.Client do
   @moduledoc "For accessing the mock or AlphaVantage Exchange Rate API"
 
   alias Exchanger.ExchangeRate.ExchangeRate
-
+  @type currency :: String.t()
   @client Application.get_env(:exchanger, :api_client)
 
+  @spec get_rate(currency, currency) :: {:error, String.t()} | {:ok, ExchangeRate.t()}
   def get_rate(from_currency, to_currency) do
     case @client.get_rate(from_currency, to_currency) do
       {:ok, rate} -> convert(rate)

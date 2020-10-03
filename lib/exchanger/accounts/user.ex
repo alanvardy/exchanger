@@ -5,6 +5,9 @@ defmodule Exchanger.Accounts.User do
   """
   use Exchanger.Schema
   alias Exchanger.Accounts.{Transaction, Wallet}
+  alias Ecto.{Changeset, Query, Queryable}
+
+  @type id :: pos_integer
 
   typed_schema "users" do
     field :first_name, :string, null: false
@@ -16,23 +19,27 @@ defmodule Exchanger.Accounts.User do
     timestamps()
   end
 
-  @doc false
+  @spec create_changeset(map) :: Changeset.t()
   def create_changeset(attrs) do
     %__MODULE__{}
     |> cast(attrs, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
   end
 
+  @spec changeset(t(), map) :: Changeset.t()
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
   end
 
+  @spec by_id(id) :: Query.t()
+  @spec by_id(Queryable.t(), id) :: Query.t()
   def by_id(query \\ __MODULE__, id) do
     from(q in query, where: q.id == ^id)
   end
 
+  @spec with_wallets(Ecto.Queryable.t()) :: Ecto.Query.t()
   def with_wallets(query \\ __MODULE__) do
     from(q in query, preload: :wallets)
   end

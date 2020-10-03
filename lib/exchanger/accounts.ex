@@ -195,7 +195,7 @@ defmodule Exchanger.Accounts do
       |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
-      {:error, _} -> {:error, "Wallet not found for currency"}
+      {:error, _error} -> {:error, "Wallet not found for currency"}
     end
   end
 
@@ -213,7 +213,7 @@ defmodule Exchanger.Accounts do
       |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
-      {:error, _} -> {:error, "Wallet not found for currency"}
+      {:error, _error} -> {:error, "Wallet not found for currency"}
       false -> {:error, "Insufficient funds"}
     end
   end

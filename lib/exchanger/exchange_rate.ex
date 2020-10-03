@@ -1,7 +1,7 @@
 defmodule Exchanger.ExchangeRate do
+  @moduledoc "The ExchangeRate context which holds all knowledge regarding the current exchange rates"
   alias Exchanger.Accounts.Balance
 
-  @moduledoc "The ExchangeRate context which holds all knowledge regarding the current exchange rates"
   @type response(data) :: {:ok, data} | {:error, :rate_not_found}
   @type currency :: String.t()
 

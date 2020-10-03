@@ -1,8 +1,7 @@
 defmodule ExchangerWeb.SubscriptionCase do
   @moduledoc "Test case for GraphQL subscriptions"
-  alias Absinthe.Phoenix.SubscriptionTest
-
   use ExUnit.CaseTemplate
+  alias Absinthe.Phoenix.SubscriptionTest
 
   using do
     quote do

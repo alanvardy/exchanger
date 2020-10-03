@@ -119,7 +119,7 @@ defmodule Exchanger.AccountsTest do
       to_wallet = insert(:wallet, user: to_user, currency: "CAD")
       to_wallet_id = to_wallet.id
 
-      assert {:ok, _} =
+      assert {:ok, _transaction} =
                Accounts.create_deposit(%{
                  to_user_id: from_wallet.user_id,
                  to_amount: 10_000,
@@ -156,7 +156,7 @@ defmodule Exchanger.AccountsTest do
       from_wallet = insert(:wallet, user: from_user, currency: "CAD")
       from_wallet_id = from_wallet.id
 
-      assert {:ok, _} =
+      assert {:ok, _transaction} =
                Accounts.create_deposit(%{
                  to_user_id: from_wallet.user_id,
                  to_amount: 10_000,

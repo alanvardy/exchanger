@@ -8,11 +8,11 @@ defmodule ExchangerWeb.Subscriptions.User do
       arg :currency, :string
 
       config fn
-        %{user_id: user_id, currency: currency}, _ when is_bitstring(currency) ->
+        %{user_id: user_id, currency: currency}, _res when is_bitstring(currency) ->
           {:ok, topic: "net_worth:#{user_id}-#{currency}"}
       end
 
-      resolve fn balance, _, _ -> {:ok, balance} end
+      resolve fn balance, _args, _res -> {:ok, balance} end
     end
   end
 end

@@ -16,6 +16,7 @@ defmodule ExchangerWeb.Schema do
   import_types ExchangerWeb.Mutations.User
   import_types ExchangerWeb.Mutations.Wallet
   import_types ExchangerWeb.Subscriptions.ExchangeRate
+  import_types ExchangerWeb.Subscriptions.User
 
   query do
     import_fields :balance_queries
@@ -32,6 +33,7 @@ defmodule ExchangerWeb.Schema do
 
   subscription do
     import_fields :exchange_rate_subscriptions
+    import_fields :user_subscriptions
   end
 
   @spec context(map) :: map

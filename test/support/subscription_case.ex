@@ -8,6 +8,7 @@ defmodule ExchangerWeb.SubscriptionCase do
     quote do
       use ExchangerWeb.ChannelCase
       use SubscriptionTest, schema: ExchangerWeb.Schema
+      import Exchanger.Factory
 
       setup do
         {:ok, socket} = Phoenix.ChannelTest.connect(ExchangerWeb.UserSocket, %{})

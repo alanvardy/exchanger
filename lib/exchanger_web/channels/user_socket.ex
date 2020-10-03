@@ -4,7 +4,10 @@ defmodule ExchangerWeb.UserSocket do
   use Absinthe.Phoenix.Socket,
     schema: ExchangerWeb.Schema
 
+  alias Phoenix.Socket
+
   channel "exchange_rate", ExchangerWeb.ExchangeRateChannel
+  channel "net_worth", ExchangerWeb.UserChannel
 
   ## Channels
   # channel "room:*", ExchangerWeb.RoomChannel
@@ -20,6 +23,7 @@ defmodule ExchangerWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
+  @spec connect(any, Socket.t(), any) :: {:ok, Socket.t()}
   def connect(_params, socket, _connect_info) do
     {:ok, socket}
   end
@@ -34,5 +38,6 @@ defmodule ExchangerWeb.UserSocket do
   #     ExchangerWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
+  @spec id(Socket.t()) :: nil
   def id(_socket), do: nil
 end

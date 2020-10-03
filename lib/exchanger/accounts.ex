@@ -8,6 +8,7 @@ defmodule Exchanger.Accounts do
   alias EctoShorts.Actions
   alias Exchanger.{ExchangeRate, Repo}
   alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
+  alias ExchangerWeb.UserChannel
 
   @type response(data) :: {:ok, data} | {:error, :wallet_not_found}
   @type change_tuple(struct) :: {:ok, struct} | {:error, Changeset.t()}
@@ -78,6 +79,17 @@ defmodule Exchanger.Accounts do
     # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(Wallet, params)
     result = Actions.all(from(u in Wallet), params)
     {:ok, result}
+  end
+
+  @spec publish_net_worth_changes(Transaction.t()) :: [any]
+  def publish_net_worth_changes(%Transaction{from_user_id: from_user_id, to_user_id: to_user_id}) do
+    user_ids = [from_user_id, to_user_id] |> Enum.reject(&is_nil/1)
+
+    for user_id <- user_ids, currency <- @currencies do
+      with {:ok, balance} <- fetch_user_balance(user_id, currency) do
+        UserChannel.publish(balance, user_id)
+      end
+    end
   end
 
   @spec fetch_user_balance(id, currency) :: {:ok, Balance.t()} | {:error, :user_not_found}

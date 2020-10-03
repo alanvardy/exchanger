@@ -164,7 +164,7 @@
         {Credo.Check.Readability.MultiAlias, false},
         {Credo.Check.Readability.Specs, []},
         {Credo.Check.Readability.SinglePipe, false},
-        {Credo.Check.Readability.WithCustomTaggedTuple, false},
+        {Credo.Check.Readability.WithCustomTaggedTuple, []},
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.DoubleBooleanNegation, []},

@@ -5,7 +5,7 @@ defmodule Exchanger.Accounts.Transaction do
 
   @deposit_attrs [:to_amount, :to_currency, :to_user_id, :to_wallet_id, :type]
   @withdrawal_attrs [:from_amount, :from_currency, :from_user_id, :from_wallet_id, :type]
-  @transfer_attrs @deposit_attrs ++ @withdrawal_attrs ++ [:exchange_rate]
+  @transfer_attrs [:exchange_rate | @deposit_attrs] ++ @withdrawal_attrs
   @currencies Application.get_env(:exchanger, :currencies)
 
   @type wallet :: Wallet.t()

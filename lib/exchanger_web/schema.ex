@@ -40,9 +40,7 @@ defmodule ExchangerWeb.Schema do
   def context(ctx) do
     source = Dataloader.Ecto.new(Exchanger.Repo)
 
-    dataloader =
-      Dataloader.new()
-      |> Dataloader.add_source(Exchanger.Accounts, source)
+    dataloader = Dataloader.add_source(Dataloader.new(), Exchanger.Accounts, source)
 
     Map.put(ctx, :loader, dataloader)
   end

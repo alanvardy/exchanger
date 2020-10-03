@@ -12,7 +12,7 @@ defmodule Exchanger.ExchangeRate.Client.Local do
          "3. To_Currency Code" => "CAD",
          "4. To_Currency Name" => "Canadian Dollar",
          "5. Exchange Rate" => "1.34",
-         "6. Last Refreshed" => Timex.now() |> Timex.format!("{RFC3339}"),
+         "6. Last Refreshed" => Timex.format!(Timex.now(), "{RFC3339}"),
          "7. Time Zone" => "UTC",
          "8. Bid Price" => "3.52",
          "9. Ask Price" => "3.52"
@@ -29,7 +29,7 @@ defmodule Exchanger.ExchangeRate.Client.Local do
          "3. To_Currency Code" => "USD",
          "4. To_Currency Name" => "US Dollar",
          "5. Exchange Rate" => "0.75",
-         "6. Last Refreshed" => Timex.now() |> Timex.format!("{RFC3339}"),
+         "6. Last Refreshed" => Timex.format!(Timex.now(), "{RFC3339}"),
          "7. Time Zone" => "UTC",
          "8. Bid Price" => "2.33",
          "9. Ask Price" => "2.33"

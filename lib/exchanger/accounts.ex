@@ -36,7 +36,7 @@ defmodule Exchanger.Accounts do
   @spec find_user(params) :: {:error, binary} | {:ok, User.t()}
   def find_user(params) do
     # Hard Dialyzer fail with Actions.find(User, params)
-    from(u in User) |> Actions.find(params)
+    Actions.find(from(u in User), params)
   end
 
   @spec list_users :: [user]
@@ -83,7 +83,7 @@ defmodule Exchanger.Accounts do
 
   @spec publish_net_worth_changes(Transaction.t()) :: [any]
   def publish_net_worth_changes(%Transaction{from_user_id: from_user_id, to_user_id: to_user_id}) do
-    user_ids = [from_user_id, to_user_id] |> Enum.reject(&is_nil/1)
+    user_ids = Enum.reject([from_user_id, to_user_id], &is_nil/1)
 
     for user_id <- user_ids, currency <- @currencies do
       with {:ok, balance} <- fetch_user_balance(user_id, currency) do
@@ -134,7 +134,7 @@ defmodule Exchanger.Accounts do
   @spec find_wallet(params) :: {:error, binary} | {:ok, Wallet.t()}
   def find_wallet(params) do
     # Hard Dialyzer fail with Actions.find(Wallet, params)
-    from(u in Wallet) |> Actions.find(params)
+    Actions.find(from(u in Wallet), params)
   end
 
   @spec get_wallet!(id) :: wallet
@@ -262,7 +262,8 @@ defmodule Exchanger.Accounts do
 
   defp maybe_format_changeset_errors({:error, %Changeset{} = changeset}) do
     errors =
-      Changeset.traverse_errors(changeset, fn {msg, opts} ->
+      changeset
+      |> Changeset.traverse_errors(fn {msg, opts} ->
         Enum.reduce(opts, msg, fn {key, value}, acc ->
           String.replace(acc, "%{#{key}}", to_string(value))
         end)

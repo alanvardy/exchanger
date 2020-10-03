@@ -13,7 +13,7 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
   """
 
   describe "@exchange_rate_updated" do
-    test "send the new exchange rate when it is updated", %{socket: socket} do
+    test "get USD and CAD exchange rates when subscribed to all exchange rates", %{socket: socket} do
       # Subscribe to the topic
       ref = push_doc(socket, @exchange_rate_updated_doc, [])
       assert_reply(ref, :ok, %{subscriptionId: subscription_id})
@@ -33,6 +33,69 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
                  }
                }
              } = data
+
+      assert_push("subscription:data", data)
+
+      assert %{
+               subscriptionId: ^subscription_id,
+               result: %{
+                 data: %{
+                   "exchangeRateUpdated" => %{
+                     "from" => "CAD",
+                     "to" => "USD",
+                     "rate" => 0.75
+                   }
+                 }
+               }
+             } = data
+    end
+
+    @usd_updated_doc """
+      subscription($currency: String) {
+        exchangeRateUpdated(currency: $currency) {
+            from
+            to
+            rate
+            updated
+        }
+      }
+    """
+
+    test "only gets USD when subscribed to USD", %{socket: socket} do
+      # Subscribe to the topic
+      ref = push_doc(socket, @usd_updated_doc, variables: %{"currency" => "USD"})
+      assert_reply(ref, :ok, %{subscriptionId: subscription_id})
+
+      :timer.sleep(200)
+
+      # The exchange rate is updating constantly
+      assert_push("subscription:data", data)
+
+      assert %{
+               subscriptionId: ^subscription_id,
+               result: %{
+                 data: %{
+                   "exchangeRateUpdated" => %{
+                     "from" => "USD",
+                     "to" => "CAD",
+                     "rate" => 1.34
+                   }
+                 }
+               }
+             } = data
+
+      refute_push("subscription:data", %{
+        subscriptionId: ^subscription_id,
+        result: %{
+          data: %{
+            "exchangeRateUpdated" => %{
+              "from" => "CAD",
+              "to" => "USD",
+              "rate" => 0.75
+            }
+          }
+        }
+      })
     end
   end
 end

@@ -1,10 +1,15 @@
 defmodule ExchangerWeb.ExchangeRateChannel do
   @moduledoc false
   use ExchangerWeb, :channel
+  alias Exchanger.ExchangeRate.ExchangeRate
 
-  def publish(exchange_rate) do
+  def publish(%ExchangeRate{from: from} = exchange_rate) do
     Absinthe.Subscription.publish(ExchangerWeb.Endpoint, exchange_rate,
-      exchange_rate_updated: "exchange_rate"
+      exchange_rate_updated: "exchange_rate:all"
+    )
+
+    Absinthe.Subscription.publish(ExchangerWeb.Endpoint, exchange_rate,
+      exchange_rate_updated: "exchange_rate:#{from}"
     )
   end
 

@@ -1,5 +1,5 @@
 defmodule ExchangerWeb.Subscriptions.User do
-  @moduledoc "Currency subscriptions for Absinthe"
+  @moduledoc "User subscriptions for Absinthe"
   use Absinthe.Schema.Notation
 
   object :user_subscriptions do

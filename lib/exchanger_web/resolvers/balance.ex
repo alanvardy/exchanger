@@ -1,5 +1,5 @@
 defmodule ExchangerWeb.Resolvers.Balance do
-  @moduledoc "User resolvers for Absinthe"
+  @moduledoc "Balance resolvers for Absinthe"
   use Absinthe.Schema.Notation
   alias Exchanger.Accounts
   alias Exchanger.Accounts.Balance

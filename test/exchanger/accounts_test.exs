@@ -4,15 +4,8 @@ defmodule Exchanger.AccountsTest do
   alias Exchanger.Accounts
   alias Exchanger.Accounts.{Balance, Transaction, User, Wallet}
 
-  @currencies Application.get_env(:exchanger, :currencies)
-
-  setup_all do
-    start_supervised({Exchanger.ExchangeRate.Store, @currencies})
-    start_supervised({Exchanger.ExchangeRate.Updater, @currencies})
-
-    # Give the Updater time to update Store
-    :timer.sleep(100)
-    :ok
+  setup do
+    start_exchange_rate_processes(["USD", "CAD"])
   end
 
   describe "users" do

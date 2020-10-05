@@ -4,6 +4,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   alias Exchanger.Accounts.Balance
 
   setup do
+    start_exchange_rate_processes(["USD", "CAD"])
     user = insert(:user)
     wallet = insert(:wallet, user: user, currency: "USD")
     [user: user, wallet: wallet]

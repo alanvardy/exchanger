@@ -1,6 +1,10 @@
 defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
   use ExchangerWeb.SubscriptionCase
 
+  setup do
+    start_exchange_rate_processes(["USD", "CAD"])
+  end
+
   @exchange_rate_updated_doc """
   subscription {
       exchangeRateUpdated {
@@ -13,7 +17,7 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
   """
 
   describe "@exchange_rate_updated" do
-    test "get USD and CAD exchange rates when subscribed to all exchange rates", %{socket: socket} do
+    test "get USD exchange rates when subscribed to all exchange rates", %{socket: socket} do
       # Subscribe to the topic
       ref = push_doc(socket, @exchange_rate_updated_doc, [])
       assert_reply(ref, :ok, %{subscriptionId: subscription_id})

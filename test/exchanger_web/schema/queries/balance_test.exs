@@ -12,6 +12,8 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
   """
 
   setup do
+    start_exchange_rate_processes(["USD", "CAD"])
+
     %{user: insert(:user)}
   end
 

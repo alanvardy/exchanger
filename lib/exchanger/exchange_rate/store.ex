@@ -7,24 +7,36 @@ defmodule Exchanger.ExchangeRate.Store do
   @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 
   @spec start_link(any) :: {:error, any} | {:ok, pid}
-  def start_link(_opts) do
-    Agent.start_link(fn -> %{} end, name: __MODULE__)
+  def start_link(caller_pid) do
+    Agent.start_link(fn -> %{} end, name: get_store_name(caller_pid))
   end
 
-  @spec fetch_rate(currency, currency) :: rate_response
-  def fetch_rate(rate, rate), do: {:ok, %{rate: 1, updated: Timex.now()}}
+  @spec fetch_rate(currency, currency, pid) :: rate_response
+  def fetch_rate(rate, rate, _caller_pid), do: {:ok, %{rate: 1, updated: Timex.now()}}
 
-  def fetch_rate(from, to) do
-    case Agent.get(__MODULE__, &Map.get(&1, from <> to)) do
+  def fetch_rate(from, to, caller_pid) do
+    store = get_store_name(caller_pid)
+
+    case Agent.get(store, &Map.get(&1, from <> to)) do
       %{rate: _rate, updated: _updated} = data -> {:ok, data}
-      _error -> {:error, :rate_not_found}
+      nil -> {:error, :rate_not_found}
     end
   end
 
-  @spec update(ExchangeRate.t()) :: ExchangeRate.t()
-  def update(%ExchangeRate{from: from, to: to, rate: rate, updated: updated} = exchange_rate) do
-    Agent.update(__MODULE__, &Map.put(&1, from <> to, %{rate: rate, updated: updated}))
+  @spec update(ExchangeRate.t(), String.t()) :: ExchangeRate.t()
+  def update(
+        %ExchangeRate{from: from, to: to, rate: rate, updated: updated} = exchange_rate,
+        store_name
+      ) do
+    Agent.update(store_name, &Map.put(&1, from <> to, %{rate: rate, updated: updated}))
 
     exchange_rate
+  end
+
+  defp get_store_name(caller_pid) do
+    case Application.get_env(:exchanger, :env) do
+      :test -> :"store#{inspect(caller_pid)}"
+      _other -> __MODULE__
+    end
   end
 end

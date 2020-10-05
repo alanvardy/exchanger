@@ -5,7 +5,8 @@ config :exchanger,
   currency_refresh: 100,
   api_client: Exchanger.ExchangeRate.Client.Http,
   exchange_rate_address: "http://localhost:4001",
-  exchange_rate_api_key: "demo"
+  exchange_rate_api_key: "demo",
+  env: :dev
 
 # Configure your database
 config :exchanger, Exchanger.Repo,

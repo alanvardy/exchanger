@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule ExchangerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :exchanger
   use Absinthe.Phoenix.Endpoint

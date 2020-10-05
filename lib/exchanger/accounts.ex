@@ -227,7 +227,7 @@ defmodule Exchanger.Accounts do
          {:ok, from_wallet} <- find_wallet(%{id: from_wallet_id}),
          %Wallet{user_id: from_user_id} <- from_wallet,
          %Wallet{currency: from_currency, balance: from_balance} <- from_wallet,
-         {:ok, %{rate: rate}} <- ExchangeRate.fetch(from_currency, to_currency),
+         {:ok, %{rate: rate}} <- ExchangeRate.fetch(from_currency, to_currency, self()),
          from_amount <- trunc(to_amount / rate),
          true <- from_amount <= from_balance do
       params

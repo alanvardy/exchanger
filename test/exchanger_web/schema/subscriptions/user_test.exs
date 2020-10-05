@@ -1,6 +1,14 @@
 defmodule ExchangerWeb.Subscriptions.UserTest do
   use ExchangerWeb.SubscriptionCase
 
+    setup do
+      start_exchange_rate_processes(["USD", "CAD"])
+
+      user = insert(:user)
+      wallet = insert(:wallet, user: user, currency: "USD")
+      [user: user, wallet: wallet]
+    end
+
   @net_worth_updated_doc """
   subscription($user_id: ID, $currency: String) {
       netWorthUpdated(user_id: $user_id, currency: $currency) {
@@ -19,14 +27,9 @@ defmodule ExchangerWeb.Subscriptions.UserTest do
     }
   """
 
-  setup do
-    user = insert(:user)
-    wallet = insert(:wallet, user: user, currency: "USD")
-    [user: user, wallet: wallet]
-  end
-
   describe "@net_worth_updated" do
     test "gets a net worth update when a deposit is made", %{socket: socket, user: user} do
+      self() |> IO.inspect(label: "TEST PID")
       # Subscribe to the topic
       ref =
         push_doc(socket, @net_worth_updated_doc,

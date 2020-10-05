@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule ExchangerWeb.Schema do
   @moduledoc "Main schema for Absinthe"
   use Absinthe.Schema

@@ -4,27 +4,20 @@ defmodule Exchanger.ExchangeRateTest do
   alias Exchanger.Accounts.Balance
   alias Exchanger.ExchangeRate
 
-  @currencies Application.get_env(:exchanger, :currencies)
-
   setup_all do
-    start_supervised({Exchanger.ExchangeRate.Store, @currencies})
-    start_supervised({Exchanger.ExchangeRate.Updater, @currencies})
-
-    # Give the Updater time to update Store
-    :timer.sleep(1000)
-    :ok
+    start_exchange_rate_processes(["USD", "CAD"])
   end
 
-  describe "fetch/2" do
+  describe "fetch/3" do
     test "can get an exchange rate" do
-      assert {:ok, %{rate: 1.34, updated: %DateTime{}}} = ExchangeRate.fetch("USD", "CAD")
-      assert {:ok, %{rate: 0.75, updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "USD")
-      assert {:ok, %{rate: 1, updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "CAD")
-      assert {:ok, %{rate: 1, updated: %DateTime{}}} = ExchangeRate.fetch("USD", "USD")
+      assert {:ok, %{rate: 1.34, updated: %DateTime{}}} = ExchangeRate.fetch("USD", "CAD", self())
+      assert {:ok, %{rate: 0.75, updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "USD", self())
+      assert {:ok, %{rate: 1, updated: %DateTime{}}} = ExchangeRate.fetch("CAD", "CAD", self())
+      assert {:ok, %{rate: 1, updated: %DateTime{}}} = ExchangeRate.fetch("USD", "USD", self())
     end
 
     test "cannot get rates for other currencies" do
-      assert {:error, :rate_not_found} = ExchangeRate.fetch("AWG", "AUD")
+      assert {:error, :rate_not_found} = ExchangeRate.fetch("AWG", "AUD", self())
     end
   end
 

@@ -2,7 +2,7 @@ defmodule Exchanger.Helpers do
   @moduledoc """
   Test helpers, imported into all test files
   """
-  import ExUnit.Assertions
+  import ExUnit.{Assertions, Callbacks}
   alias Exchanger.Accounts
   alias Exchanger.Accounts.Wallet
   alias ExchangerWeb.Schema
@@ -24,6 +24,13 @@ defmodule Exchanger.Helpers do
                to_amount: amount,
                to_currency: currency
              })
+  end
+
+  def start_exchange_rate_processes(currencies) do
+    start_supervised!({Exchanger.ExchangeRate.Store, self()})
+    start_supervised!({Exchanger.ExchangeRate.Updater, {List.wrap(currencies), self()}})
+    :timer.sleep(1000)
+    :ok
   end
 
   @doc """

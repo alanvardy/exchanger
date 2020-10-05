@@ -16,16 +16,6 @@ defmodule Exchanger.AccountsTest do
   end
 
   describe "users" do
-    test "list_users/0 returns all users" do
-      user = insert(:user)
-      assert Accounts.list_users() == [user]
-    end
-
-    test "get_user!/1 returns the user with given id" do
-      user = insert(:user)
-      assert Accounts.get_user!(user.id) == user
-    end
-
     test "create_user/1 with valid data creates a user" do
       params = params_for(:user)
       assert {:ok, %User{} = user} = Accounts.create_user(params)

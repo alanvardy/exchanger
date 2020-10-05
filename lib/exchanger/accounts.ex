@@ -29,8 +29,7 @@ defmodule Exchanger.Accounts do
   @spec all_users(params) :: {:ok, [User.t()]} | {:error, binary}
   def all_users(params) do
     # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(User, params)
-    result = Actions.all(from(u in User), params)
-    {:ok, result}
+    {:ok, Actions.all(from(u in User), params)}
   end
 
   @spec find_user(params) :: {:error, binary} | {:ok, User.t()}
@@ -39,16 +38,7 @@ defmodule Exchanger.Accounts do
     Actions.find(from(u in User), params)
   end
 
-  @spec list_users :: [user]
-  def list_users do
-    Repo.all(User)
-  end
-
-  @spec get_user!(id) :: user
-  def get_user!(id), do: Repo.get!(User, id)
-
-  @spec fetch_user_with_wallets(id) :: {:ok, user} | {:error, :user_not_found}
-  def fetch_user_with_wallets(user_id) do
+  defp fetch_user_with_wallets(user_id) do
     user_id
     |> User.by_id()
     |> User.with_wallets()
@@ -77,8 +67,7 @@ defmodule Exchanger.Accounts do
   @spec all_wallets(params) :: {:ok, [Wallet.t()]} | {:error, binary}
   def all_wallets(params) do
     # Sorry, I know it is ugly, but Dialyzer gives me a hard fail when I use Actions.all(Wallet, params)
-    result = Actions.all(from(u in Wallet), params)
-    {:ok, result}
+    {:ok, Actions.all(from(u in Wallet), params)}
   end
 
   @spec publish_net_worth_changes(Transaction.t()) :: [any]

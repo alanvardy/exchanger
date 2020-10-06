@@ -3,7 +3,7 @@ defmodule Exchanger.ExchangeRate.Client.Http do
   @behaviour Exchanger.ExchangeRate.Client.Behaviour
   alias HTTPoison.Response
 
-  @type currency :: String.t()
+  @type currency :: :USD | :CAD | :GBP
 
   @address Application.get_env(:exchanger, :exchange_rate_address)
   @query "/query?function=CURRENCY_EXCHANGE_RATE&from_currency="

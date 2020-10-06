@@ -10,7 +10,7 @@ defmodule Exchanger.Accounts.Transaction do
 
   @type wallet :: Wallet.t()
   @type changeset :: Ecto.Changeset.t()
-  @type currency :: String.t()
+  @type currency :: :USD | :CAD | :GBP
   @type amount :: pos_integer()
   @type exchange_rate :: float()
 
@@ -25,9 +25,9 @@ defmodule Exchanger.Accounts.Transaction do
     belongs_to :to_user, User
     belongs_to :to_wallet, Wallet
     field :from_amount, :integer
-    field :from_currency, :string
+    field(:from_currency, Ecto.Enum, values: [nil | @currencies]) :: currency
     field :to_amount, :integer
-    field :to_currency, :string
+    field(:to_currency, Ecto.Enum, values: [nil | @currencies]) :: currency
     field :exchange_rate, :float
     field :type, :string, null: false
 

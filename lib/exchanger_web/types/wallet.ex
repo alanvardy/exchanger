@@ -7,7 +7,7 @@ defmodule ExchangerWeb.Types.Wallet do
   object :wallet do
     field :id, :id
     field :user_id, :id
-    field :currency, :string
+    field :currency, :currency
     field :balance, :integer
 
     field :user, :user, resolve: dataloader(Exchanger.Accounts, :user)

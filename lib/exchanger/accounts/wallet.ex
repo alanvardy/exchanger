@@ -9,11 +9,11 @@ defmodule Exchanger.Accounts.Wallet do
   @currencies Application.get_env(:exchanger, :currencies)
 
   @type queryable :: Ecto.Queryable.t()
-  @type currency :: String.t()
+  @type currency :: :USD | :CAD | :GBP
   @type id :: pos_integer
 
   typed_schema "wallets" do
-    field :currency, :string, null: false
+    field(:currency, Ecto.Enum, values: [nil | @currencies]) :: currency
     field :balance, :integer, null: false
     belongs_to :user, User
     has_many :sent_transactions, Transaction, foreign_key: :from_wallet_id

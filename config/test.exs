@@ -16,7 +16,7 @@ config :exchanger, ExchangerWeb.Endpoint,
   server: false
 
 config :exchanger,
-  currencies: ["USD", "CAD"],
+  currencies: [:USD, :CAD],
   currency_refresh: 20,
   api_client: Exchanger.ExchangeRate.Client.Local
 

@@ -4,10 +4,13 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRate do
 
   object :exchange_rate_subscriptions do
     field :exchange_rate_updated, :exchange_rate do
-      arg :currency, :string
+      arg :currency, :currency
 
       config fn
-        %{currency: currency}, _res when is_bitstring(currency) ->
+        %{currency: nil}, _res ->
+          {:ok, topic: "exchange_rate:all"}
+
+        %{currency: currency}, _res when is_atom(currency) ->
           {:ok, topic: "exchange_rate:#{currency}"}
 
         _args, _res ->

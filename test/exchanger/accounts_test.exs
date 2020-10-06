@@ -49,11 +49,11 @@ defmodule Exchanger.AccountsTest do
 
     test "fetch_wallet_by_currency/2 with invalid data returns error changeset" do
       user = insert(:user)
-      insert(:wallet, user: user, currency: "USD")
-      insert(:wallet, user: user, currency: "CAD")
+      insert(:wallet, user: user, currency: :USD)
+      insert(:wallet, user: user, currency: :CAD)
 
-      assert {:ok, %Wallet{currency: "USD"}} = Accounts.fetch_wallet_by_currency(user, "USD")
-      assert {:ok, %Wallet{currency: "CAD"}} = Accounts.fetch_wallet_by_currency(user, "CAD")
+      assert {:ok, %Wallet{currency: :USD}} = Accounts.fetch_wallet_by_currency(user, :USD)
+      assert {:ok, %Wallet{currency: :CAD}} = Accounts.fetch_wallet_by_currency(user, :CAD)
     end
   end
 
@@ -102,18 +102,18 @@ defmodule Exchanger.AccountsTest do
     test "with valid data creates a transaction" do
       from_user = insert(:user)
       from_user_id = from_user.id
-      from_wallet = insert(:wallet, user: from_user, currency: "USD")
+      from_wallet = insert(:wallet, user: from_user, currency: :USD)
       from_wallet_id = from_wallet.id
       to_user = insert(:user)
       to_user_id = to_user.id
-      to_wallet = insert(:wallet, user: to_user, currency: "CAD")
+      to_wallet = insert(:wallet, user: to_user, currency: :CAD)
       to_wallet_id = to_wallet.id
 
       assert {:ok, _transaction} =
                Accounts.create_deposit(%{
                  to_user_id: from_wallet.user_id,
                  to_amount: 10_000,
-                 to_currency: "USD"
+                 to_currency: :USD
                })
 
       assert {:ok,
@@ -125,14 +125,14 @@ defmodule Exchanger.AccountsTest do
                 from_user_id: ^from_user_id,
                 to_wallet_id: ^to_wallet_id,
                 from_wallet_id: ^from_wallet_id,
-                from_currency: "USD",
-                to_currency: "CAD",
+                from_currency: :USD,
+                to_currency: :CAD,
                 exchange_rate: 1.34
               }} =
                Accounts.create_transfer(%{
                  from_wallet_id: from_wallet_id,
                  to_user_id: to_user.id,
-                 to_currency: "CAD",
+                 to_currency: :CAD,
                  to_amount: 1000
                })
 
@@ -143,19 +143,19 @@ defmodule Exchanger.AccountsTest do
     test "with same currencies creates a transaction" do
       from_user = insert(:user)
       from_user_id = from_user.id
-      from_wallet = insert(:wallet, user: from_user, currency: "CAD")
+      from_wallet = insert(:wallet, user: from_user, currency: :CAD)
       from_wallet_id = from_wallet.id
 
       assert {:ok, _transaction} =
                Accounts.create_deposit(%{
                  to_user_id: from_wallet.user_id,
                  to_amount: 10_000,
-                 to_currency: "CAD"
+                 to_currency: :CAD
                })
 
       to_user = insert(:user)
       to_user_id = to_user.id
-      to_wallet = insert(:wallet, user: to_user, currency: "CAD")
+      to_wallet = insert(:wallet, user: to_user, currency: :CAD)
       to_wallet_id = to_wallet.id
 
       assert {:ok,
@@ -167,14 +167,14 @@ defmodule Exchanger.AccountsTest do
                 from_user_id: ^from_user_id,
                 to_wallet_id: ^to_wallet_id,
                 from_wallet_id: ^from_wallet_id,
-                from_currency: "CAD",
-                to_currency: "CAD",
+                from_currency: :CAD,
+                to_currency: :CAD,
                 exchange_rate: 1.0
               }} =
                Accounts.create_transfer(%{
                  from_wallet_id: from_wallet_id,
                  to_user_id: to_user.id,
-                 to_currency: "CAD",
+                 to_currency: :CAD,
                  to_amount: 3000
                })
     end
@@ -182,34 +182,34 @@ defmodule Exchanger.AccountsTest do
 
   describe "get_wallet_balance/1" do
     test "can get a balance with a deposit" do
-      wallet = insert(:wallet, currency: "USD", user: build(:user))
+      wallet = insert(:wallet, currency: :USD, user: build(:user))
 
       {:ok, %Transaction{}} =
         Accounts.create_deposit(%{
           to_user_id: wallet.user_id,
-          to_currency: "USD",
+          to_currency: :USD,
           to_amount: 10_000
         })
 
-      assert %Balance{amount: 10_000, currency: "USD"} = Accounts.get_wallet_balance(wallet)
+      assert %Balance{amount: 10_000, currency: :USD} = Accounts.get_wallet_balance(wallet)
     end
 
     test "can get a balance with a deposit and transfers" do
-      wallet1 = insert(:wallet, currency: "USD", user: build(:user))
-      wallet2 = insert(:wallet, currency: "USD", user: build(:user))
-      wallet3 = insert(:wallet, currency: "USD", user: build(:user))
+      wallet1 = insert(:wallet, currency: :USD, user: build(:user))
+      wallet2 = insert(:wallet, currency: :USD, user: build(:user))
+      wallet3 = insert(:wallet, currency: :USD, user: build(:user))
 
       {:ok, %Transaction{}} =
         Accounts.create_deposit(%{
           to_user_id: wallet1.user_id,
-          to_currency: "USD",
+          to_currency: :USD,
           to_amount: 10_000
         })
 
       {:ok, %Transaction{}} =
         Accounts.create_deposit(%{
           to_user_id: wallet3.user_id,
-          to_currency: "USD",
+          to_currency: :USD,
           to_amount: 10_000
         })
 
@@ -217,7 +217,7 @@ defmodule Exchanger.AccountsTest do
         Accounts.create_transfer(%{
           from_wallet_id: wallet1.id,
           to_user_id: wallet2.user_id,
-          to_currency: "USD",
+          to_currency: :USD,
           to_amount: 5_000
         })
 
@@ -225,13 +225,13 @@ defmodule Exchanger.AccountsTest do
         Accounts.create_transfer(%{
           from_wallet_id: wallet3.id,
           to_user_id: wallet1.user_id,
-          to_currency: "USD",
+          to_currency: :USD,
           to_amount: 3_000
         })
 
-      assert %Balance{amount: 8_000, currency: "USD"} = Accounts.get_wallet_balance(wallet1)
-      assert %Balance{amount: 5_000, currency: "USD"} = Accounts.get_wallet_balance(wallet2)
-      assert %Balance{amount: 7_000, currency: "USD"} = Accounts.get_wallet_balance(wallet3)
+      assert %Balance{amount: 8_000, currency: :USD} = Accounts.get_wallet_balance(wallet1)
+      assert %Balance{amount: 5_000, currency: :USD} = Accounts.get_wallet_balance(wallet2)
+      assert %Balance{amount: 7_000, currency: :USD} = Accounts.get_wallet_balance(wallet3)
     end
   end
 
@@ -239,65 +239,65 @@ defmodule Exchanger.AccountsTest do
     test "Returns 0 for no wallets" do
       %User{id: user_id} = insert(:user)
 
-      {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(user_id, "USD")
+      {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(user_id, :USD)
     end
 
     test "Returns the balance of one wallet" do
       %User{id: user_id} = insert(:user)
-      %Wallet{id: wallet_id} = insert(:wallet, currency: "USD", user_id: user_id)
+      %Wallet{id: wallet_id} = insert(:wallet, currency: :USD, user_id: user_id)
 
       insert(:deposit,
-        to_currency: "USD",
+        to_currency: :USD,
         to_amount: 20,
         to_wallet_id: wallet_id,
         to_user_id: user_id
       )
 
-      {:ok, %Balance{amount: 20}} = Accounts.fetch_user_balance(user_id, "USD")
+      {:ok, %Balance{amount: 20}} = Accounts.fetch_user_balance(user_id, :USD)
     end
 
     test "Can aggregate multiple wallets" do
       %User{id: user_id} = insert(:user)
-      %Wallet{id: wallet_id} = insert(:wallet, currency: "USD", user_id: user_id)
+      %Wallet{id: wallet_id} = insert(:wallet, currency: :USD, user_id: user_id)
 
       insert(:deposit,
-        to_currency: "USD",
+        to_currency: :USD,
         to_amount: 20,
         to_wallet_id: wallet_id,
         to_user_id: user_id
       )
 
       insert(:deposit,
-        to_currency: "USD",
+        to_currency: :USD,
         to_amount: 15,
         to_wallet_id: wallet_id,
         to_user_id: user_id
       )
 
-      {:ok, %Balance{amount: 35}} = Accounts.fetch_user_balance(user_id, "USD")
+      {:ok, %Balance{amount: 35}} = Accounts.fetch_user_balance(user_id, :USD)
     end
 
     test "Can aggregate multiple wallets with different currencies" do
       %User{id: user_id} = insert(:user)
-      %Wallet{id: usd_id} = insert(:wallet, currency: "USD", user_id: user_id)
-      %Wallet{id: cad_id} = insert(:wallet, currency: "CAD", user_id: user_id)
+      %Wallet{id: usd_id} = insert(:wallet, currency: :USD, user_id: user_id)
+      %Wallet{id: cad_id} = insert(:wallet, currency: :CAD, user_id: user_id)
 
       insert(:deposit,
-        to_currency: "USD",
+        to_currency: :USD,
         to_amount: 20,
         to_wallet_id: usd_id,
         to_user_id: user_id
       )
 
       insert(:deposit,
-        to_currency: "CAD",
+        to_currency: :CAD,
         to_amount: 20,
         to_wallet_id: cad_id,
         to_user_id: user_id
       )
 
-      {:ok, %Balance{amount: 35, currency: "USD"}} = Accounts.fetch_user_balance(user_id, "USD")
-      {:ok, %Balance{amount: 46, currency: "CAD"}} = Accounts.fetch_user_balance(user_id, "CAD")
+      {:ok, %Balance{amount: 35, currency: :USD}} = Accounts.fetch_user_balance(user_id, :USD)
+      {:ok, %Balance{amount: 46, currency: :CAD}} = Accounts.fetch_user_balance(user_id, :CAD)
     end
   end
 end

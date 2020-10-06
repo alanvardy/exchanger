@@ -51,7 +51,7 @@ defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
     end
 
     @usd_updated_doc """
-      subscription($currency: String) {
+      subscription($currency: Currency) {
         exchangeRateUpdated(currency: $currency) {
             from
             to

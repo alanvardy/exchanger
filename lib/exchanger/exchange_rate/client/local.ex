@@ -3,7 +3,7 @@ defmodule Exchanger.ExchangeRate.Client.Local do
   @moduledoc "For querying the exchange rate api"
   @behaviour Exchanger.ExchangeRate.Client.Behaviour
 
-  def get_rate("USD", "CAD") do
+  def get_rate(:USD, :CAD) do
     {:ok,
      %{
        "Realtime Currency Exchange Rate" => %{
@@ -20,7 +20,7 @@ defmodule Exchanger.ExchangeRate.Client.Local do
      }}
   end
 
-  def get_rate("CAD", "USD") do
+  def get_rate(:CAD, :USD) do
     {:ok,
      %{
        "Realtime Currency Exchange Rate" => %{

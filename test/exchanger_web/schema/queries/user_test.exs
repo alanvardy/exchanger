@@ -63,7 +63,7 @@ defmodule ExchangerWeb.Schema.Queries.UserTest do
         |> get_in([:data, "user", "wallets"])
 
       assert id === Integer.to_string(wallet.id)
-      assert currency === wallet.currency
+      assert currency === to_string(wallet.currency)
     end
 
     test "can get user with wallets and transactions", %{user: user} do

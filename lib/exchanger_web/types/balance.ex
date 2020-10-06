@@ -5,7 +5,7 @@ defmodule ExchangerWeb.Types.Balance do
   @desc "A balance in a currency at a point in time"
   object :balance do
     field :amount, :integer
-    field :currency, :string
+    field :currency, :currency
     field :timestamp, :string
   end
 end

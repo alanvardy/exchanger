@@ -2,7 +2,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
   use Exchanger.DataCase, async: true
 
   @wallet_doc """
-    query findWallet($id: ID, $user_id: ID, $currency: String) {
+    query findWallet($id: ID, $user_id: ID, $currency: Currency) {
       wallet(id: $id, user_id: $user_id, currency: $currency) {
         id,
         user_id,
@@ -17,7 +17,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
   """
 
   @wallets_doc """
-    query findWallets($user_id: ID, $currency: String) {
+    query findWallets($user_id: ID, $currency: Currency) {
       wallets(user_id: $user_id, currency: $currency) {
         id,
         user_id,
@@ -36,7 +36,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
     test "Can get wallet by currency", %{wallet: wallet} do
       wallet_id =
         @wallet_doc
-        |> run_schema(%{"currency" => wallet.currency})
+        |> run_schema(%{"currency" => to_string(wallet.currency)})
         |> get_in([:data, "wallet", "id"])
         |> String.to_integer()
 
@@ -46,7 +46,7 @@ defmodule ExchangerWeb.Schema.Queries.WalletTest do
     test "Gets the wallets owner", %{wallet: wallet, user: user} do
       user_id =
         @wallet_doc
-        |> run_schema(%{"currency" => wallet.currency})
+        |> run_schema(%{"currency" => to_string(wallet.currency)})
         |> get_in([:data, "wallet", "user", "id"])
         |> String.to_integer()
 

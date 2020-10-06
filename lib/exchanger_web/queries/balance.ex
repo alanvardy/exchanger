@@ -6,7 +6,7 @@ defmodule ExchangerWeb.Queries.Balance do
   object :balance_queries do
     field :net_worth, :balance do
       arg :user_id, non_null(:id)
-      arg :currency, non_null(:string)
+      arg :currency, non_null(:currency)
       resolve &Resolvers.Balance.get_net_worth/2
     end
   end

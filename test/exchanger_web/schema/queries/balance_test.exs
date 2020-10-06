@@ -2,7 +2,7 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
   use Exchanger.DataCase, async: true
 
   @net_worth_doc """
-    query getNetWorth($user_id: ID, $currency: String) {
+    query getNetWorth($user_id: ID, $currency: Currency) {
       net_worth(user_id: $user_id, currency: $currency) {
         amount,
         currency,
@@ -26,8 +26,8 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
     end
 
     test "Can get net worth of a user", %{user: user} do
-      wallet = insert(:wallet, currency: "USD", user: user)
-      insert(:deposit, to_currency: "USD", to_amount: 10_000, to_wallet: wallet)
+      wallet = insert(:wallet, currency: :USD, user: user)
+      insert(:deposit, to_currency: :USD, to_amount: 10_000, to_wallet: wallet)
 
       balance =
         @net_worth_doc
@@ -38,9 +38,9 @@ defmodule ExchangerWeb.Schema.Queries.BalanceTest do
     end
 
     test "Can get net worth of a user over multiple currencies", %{user: user} do
-      wallet = insert(:wallet, currency: "USD", user: user)
-      insert(:deposit, to_currency: "USD", to_amount: 10_000, to_wallet: wallet)
-      insert(:deposit, to_currency: "CAD", to_amount: 20_000, to_wallet: wallet)
+      wallet = insert(:wallet, currency: :USD, user: user)
+      insert(:deposit, to_currency: :USD, to_amount: 10_000, to_wallet: wallet)
+      insert(:deposit, to_currency: :CAD, to_amount: 20_000, to_wallet: wallet)
 
       balance =
         @net_worth_doc

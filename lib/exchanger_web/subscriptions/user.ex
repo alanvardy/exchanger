@@ -4,11 +4,11 @@ defmodule ExchangerWeb.Subscriptions.User do
 
   object :user_subscriptions do
     field :net_worth_updated, :balance do
-      arg :user_id, :id
-      arg :currency, :string
+      arg :user_id, non_null(:id)
+      arg :currency, non_null(:currency)
 
       config fn
-        %{user_id: user_id, currency: currency}, _res when is_bitstring(currency) ->
+        %{user_id: user_id, currency: currency}, _res ->
           {:ok, topic: "net_worth:#{user_id}-#{currency}"}
       end
 

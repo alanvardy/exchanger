@@ -10,8 +10,8 @@ defmodule ExchangerWeb.Types.Transaction do
     field :to_user_id, :id
     field :from_wallet_id, :id
     field :to_wallet_id, :id
-    field :from_currency, :string
-    field :to_currency, :string
+    field :from_currency, :currency
+    field :to_currency, :currency
     field :from_amount, :integer
     field :to_amount, :integer
     field :exchange_rate, :float

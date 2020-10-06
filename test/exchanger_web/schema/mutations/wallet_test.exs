@@ -3,7 +3,7 @@ defmodule ExchangerWeb.Schema.Mutations.WalletTest do
   alias Exchanger.Accounts
 
   @create_wallet_doc """
-    mutation createWallet($user_id: ID, $currency: String) {
+    mutation createWallet($user_id: ID, $currency: Currency) {
       create_wallet(user_id: $user_id, currency: $currency) {
         currency
         balance
@@ -21,7 +21,7 @@ defmodule ExchangerWeb.Schema.Mutations.WalletTest do
 
       {:ok, wallets} = Accounts.all_wallets(%{})
       assert Enum.count(wallets) == 1
-      assert List.first(wallets).currency == "USD"
+      assert List.first(wallets).currency == :USD
       assert List.first(wallets).user_id == user.id
     end
   end

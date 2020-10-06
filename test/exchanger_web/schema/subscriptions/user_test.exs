@@ -2,7 +2,7 @@ defmodule ExchangerWeb.Subscriptions.UserTest do
   use ExchangerWeb.SubscriptionCase
 
   @net_worth_updated_doc """
-  subscription($user_id: ID, $currency: String) {
+  subscription($user_id: ID, $currency: Currency) {
       netWorthUpdated(user_id: $user_id, currency: $currency) {
           amount
           currency
@@ -12,7 +12,7 @@ defmodule ExchangerWeb.Subscriptions.UserTest do
   """
 
   @create_deposit_doc """
-    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
+    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: Currency) {
       create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
         id
       }

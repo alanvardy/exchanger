@@ -10,7 +10,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   end
 
   @create_deposit_doc """
-    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: String) {
+    mutation createDeposit($to_user_id: ID, $to_amount: Int, $to_currency: Currency) {
       create_deposit(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency) {
         id
       }
@@ -21,7 +21,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
     test "creates a deposit", %{user: user, wallet: wallet} do
       assert %{data: %{"create_deposit" => %{"id" => _id}}} =
                run_schema(@create_deposit_doc, %{
-                 "to_currency" => wallet.currency,
+                 "to_currency" => to_string(wallet.currency),
                  "to_user_id" => user.id,
                  "to_amount" => 10_000
                })
@@ -69,7 +69,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   end
 
   @create_withdrawal_doc """
-    mutation createWithdrawal($from_user_id: ID, $from_amount: Int, $from_currency: String) {
+    mutation createWithdrawal($from_user_id: ID, $from_amount: Int, $from_currency: Currency) {
       create_withdrawal(from_user_id: $from_user_id, from_amount: $from_amount, from_currency: $from_currency) {
         id
       }
@@ -78,7 +78,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
   describe "@create_withdrawal" do
     test "creates a withdrawal", %{user: user, wallet: from_wallet} do
-      currency = "USD"
+      currency = :USD
 
       deposit_in_wallet(from_wallet, 10_000)
 
@@ -86,7 +86,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert %{data: %{"create_withdrawal" => %{"id" => _id}}} =
                run_schema(@create_withdrawal_doc, %{
-                 "from_currency" => currency,
+                 "from_currency" => to_string(currency),
                  "from_user_id" => from_wallet.user_id,
                  "from_amount" => 5_000
                })
@@ -122,7 +122,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
       assert %{errors: [%{message: "Insufficient funds"}]} =
                run_schema(@create_withdrawal_doc, %{
-                 "from_currency" => from_wallet.currency,
+                 "from_currency" => to_string(from_wallet.currency),
                  "from_user_id" => user.id,
                  "from_amount" => 20_000
                })
@@ -136,7 +136,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
   end
 
   @create_transfer_doc """
-    mutation createTransfer($to_user_id: ID, $to_amount: Int, $to_currency: String, $from_wallet_id: ID) {
+    mutation createTransfer($to_user_id: ID, $to_amount: Int, $to_currency: Currency, $from_wallet_id: ID) {
       create_transfer(to_user_id: $to_user_id, to_amount: $to_amount, to_currency: $to_currency, from_wallet_id: $from_wallet_id) {
         id
       }
@@ -145,11 +145,11 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
 
   describe "@create_transfer" do
     test "creates a transfer", %{wallet: from_wallet} do
-      currency = "USD"
+      currency = :USD
 
       deposit_in_wallet(from_wallet, 10_000)
 
-      to_wallet = insert(:wallet, user: build(:user), currency: "USD")
+      to_wallet = insert(:wallet, user: build(:user), currency: currency)
 
       assert {:ok, %Balance{amount: 10_000}} =
                Accounts.fetch_user_balance(from_wallet.user_id, currency)
@@ -159,7 +159,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
       assert %{data: %{"create_transfer" => %{"id" => _id}}} =
                run_schema(@create_transfer_doc, %{
                  "to_user_id" => to_wallet.user_id,
-                 "to_currency" => currency,
+                 "to_currency" => to_string(currency),
                  "to_amount" => 6_000,
                  "from_wallet_id" => from_wallet.id
                })
@@ -177,12 +177,12 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
     test "can transfer across currencies", %{wallet: from_wallet} do
       deposit_in_wallet(from_wallet, 10_000)
 
-      to_wallet = insert(:wallet, user: build(:user), currency: "CAD")
+      to_wallet = insert(:wallet, user: build(:user), currency: :CAD)
 
       assert {:ok, %Balance{amount: 10_000}} =
-               Accounts.fetch_user_balance(from_wallet.user_id, "USD")
+               Accounts.fetch_user_balance(from_wallet.user_id, :USD)
 
-      assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, "CAD")
+      assert {:ok, %Balance{amount: 0}} = Accounts.fetch_user_balance(to_wallet.user_id, :CAD)
 
       assert %{data: %{"create_transfer" => %{"id" => _id}}} =
                run_schema(@create_transfer_doc, %{
@@ -196,18 +196,17 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
       assert Enum.count(transactions) == 2
 
       assert {:ok, %Balance{amount: 5_523}} =
-               Accounts.fetch_user_balance(from_wallet.user_id, "USD")
+               Accounts.fetch_user_balance(from_wallet.user_id, :USD)
 
-      assert {:ok, %Balance{amount: 6_000}} =
-               Accounts.fetch_user_balance(to_wallet.user_id, "CAD")
+      assert {:ok, %Balance{amount: 6_000}} = Accounts.fetch_user_balance(to_wallet.user_id, :CAD)
     end
 
     test "cannot transfer if insufficient funds", %{wallet: from_wallet} do
-      currency = "USD"
+      currency = :USD
 
       deposit_in_wallet(from_wallet, 5_000)
 
-      to_wallet = insert(:wallet, user: build(:user), currency: "USD")
+      to_wallet = insert(:wallet, user: build(:user), currency: :USD)
 
       assert {:ok, %Balance{amount: 5_000}} =
                Accounts.fetch_user_balance(from_wallet.user_id, currency)
@@ -217,7 +216,7 @@ defmodule ExchangerWeb.Schema.Mutations.TransactionTest do
       assert %{errors: [%{message: "Insufficient funds"}]} =
                run_schema(@create_transfer_doc, %{
                  "to_user_id" => to_wallet.user_id,
-                 "to_currency" => currency,
+                 "to_currency" => to_string(currency),
                  "to_amount" => 6_000,
                  "from_wallet_id" => from_wallet.id
                })

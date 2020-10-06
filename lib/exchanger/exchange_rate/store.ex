@@ -3,7 +3,7 @@ defmodule Exchanger.ExchangeRate.Store do
   use Agent
   alias Exchanger.ExchangeRate.ExchangeRate
 
-  @type currency :: String.t()
+  @type currency :: :USD | :CAD | :GBP
   @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 
   @spec start_link(any) :: {:error, any} | {:ok, pid}
@@ -15,7 +15,7 @@ defmodule Exchanger.ExchangeRate.Store do
   def fetch_rate(rate, rate), do: {:ok, %{rate: 1, updated: Timex.now()}}
 
   def fetch_rate(from, to) do
-    case Agent.get(__MODULE__, &Map.get(&1, from <> to)) do
+    case Agent.get(__MODULE__, &Map.get(&1, "#{from}#{to}")) do
       %{rate: _rate, updated: _updated} = data -> {:ok, data}
       _error -> {:error, :rate_not_found}
     end
@@ -23,7 +23,7 @@ defmodule Exchanger.ExchangeRate.Store do
 
   @spec update(ExchangeRate.t()) :: ExchangeRate.t()
   def update(%ExchangeRate{from: from, to: to, rate: rate, updated: updated} = exchange_rate) do
-    Agent.update(__MODULE__, &Map.put(&1, from <> to, %{rate: rate, updated: updated}))
+    Agent.update(__MODULE__, &Map.put(&1, "#{from}#{to}", %{rate: rate, updated: updated}))
 
     exchange_rate
   end

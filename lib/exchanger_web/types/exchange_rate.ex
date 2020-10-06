@@ -4,8 +4,8 @@ defmodule ExchangerWeb.Types.ExchangeRate do
 
   @desc "An exchange rate between 2 currencies at a point in time"
   object :exchange_rate do
-    field :from, :string
-    field :to, :string
+    field :from, :currency
+    field :to, :currency
     field :rate, :float
     field :updated, :string
   end

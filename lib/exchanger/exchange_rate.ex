@@ -3,7 +3,7 @@ defmodule Exchanger.ExchangeRate do
   alias Exchanger.Accounts.Balance
 
   @type response(data) :: {:ok, data} | {:error, :rate_not_found}
-  @type currency :: String.t()
+  @type currency :: :USD | :CAD | :GBP
 
   @spec fetch(currency, currency) :: response(%{rate: float, updated: DateTime.t()})
   defdelegate fetch(from_currency, to_currency), to: Exchanger.ExchangeRate.Store, as: :fetch_rate

@@ -83,12 +83,8 @@ defmodule Exchanger.Accounts do
 
   @spec fetch_user_balance(id, currency) :: {:ok, Balance.t()} | {:error, :user_not_found}
   def fetch_user_balance(user_id, currency) when currency in @currencies do
-    case fetch_user_with_wallets(user_id) do
-      {:ok, %User{wallets: wallets}} ->
+    with {:ok, %User{wallets: wallets}} <- fetch_user_with_wallets(user_id) do
         aggregate_balances(wallets, currency)
-
-      error ->
-        error
     end
   end
 

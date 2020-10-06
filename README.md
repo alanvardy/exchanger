@@ -7,7 +7,7 @@
 ```
 git clone git@github.com:alanvardy/exchanger.git
 cd exchanger
-docker-compose up -d
+docker-compose up -d # Stand up postgres and the mock API server
 mix deps.get
-mix check
+mix check # Run the test suite
 ```

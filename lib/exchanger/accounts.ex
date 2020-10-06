@@ -84,7 +84,7 @@ defmodule Exchanger.Accounts do
   @spec fetch_user_balance(id, currency) :: {:ok, Balance.t()} | {:error, :user_not_found}
   def fetch_user_balance(user_id, currency) when currency in @currencies do
     with {:ok, %User{wallets: wallets}} <- fetch_user_with_wallets(user_id) do
-        aggregate_balances(wallets, currency)
+      aggregate_balances(wallets, currency)
     end
   end
 
@@ -97,23 +97,17 @@ defmodule Exchanger.Accounts do
   defp aggregate_balances([wallet | tail], currency, sum) do
     {:ok, %Balance{amount: amount}} =
       wallet
-      |> get_wallet_balance!()
+      |> get_wallet_balance()
       |> ExchangeRate.equivalent_in_currency(currency)
 
     aggregate_balances(tail, currency, sum + amount)
   end
 
-  @spec get_wallet_balance!(Wallet.t()) :: Balance.t()
-  def get_wallet_balance!(%Wallet{id: id, currency: currency}) do
-    %Wallet{sent_transactions: subs, received_transactions: adds} =
-      id
-      |> Wallet.where_id()
-      |> Wallet.with_transactions()
-      |> Repo.one!()
-
-    additions = Enum.reduce(adds, 0, fn x, acc -> x.to_amount + acc end)
-    subtractions = Enum.reduce(subs, 0, fn x, acc -> x.from_amount + acc end)
-    %Balance{amount: additions - subtractions, currency: currency, timestamp: Timex.now()}
+  @spec get_wallet_balance(Wallet.t()) :: Balance.t()
+  def get_wallet_balance(%Wallet{id: id}) do
+    # Grab wallet again in case balance has changed
+    %Wallet{currency: currency, balance: balance} = get_wallet!(id)
+    %Balance{amount: balance, currency: currency, timestamp: Timex.now()}
   end
 
   @spec find_wallet(params) :: {:error, binary} | {:ok, Wallet.t()}

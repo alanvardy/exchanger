@@ -180,7 +180,7 @@ defmodule Exchanger.AccountsTest do
     end
   end
 
-  describe "get_wallet_balance!/1" do
+  describe "get_wallet_balance/1" do
     test "can get a balance with a deposit" do
       wallet = insert(:wallet, currency: "USD", user: build(:user))
 
@@ -191,7 +191,7 @@ defmodule Exchanger.AccountsTest do
           to_amount: 10_000
         })
 
-      assert %Balance{amount: 10_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet)
+      assert %Balance{amount: 10_000, currency: "USD"} = Accounts.get_wallet_balance(wallet)
     end
 
     test "can get a balance with a deposit and transfers" do
@@ -229,9 +229,9 @@ defmodule Exchanger.AccountsTest do
           to_amount: 3_000
         })
 
-      assert %Balance{amount: 8_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet1)
-      assert %Balance{amount: 5_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet2)
-      assert %Balance{amount: 7_000, currency: "USD"} = Accounts.get_wallet_balance!(wallet3)
+      assert %Balance{amount: 8_000, currency: "USD"} = Accounts.get_wallet_balance(wallet1)
+      assert %Balance{amount: 5_000, currency: "USD"} = Accounts.get_wallet_balance(wallet2)
+      assert %Balance{amount: 7_000, currency: "USD"} = Accounts.get_wallet_balance(wallet3)
     end
   end
 

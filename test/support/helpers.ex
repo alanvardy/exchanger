@@ -5,7 +5,7 @@ defmodule Exchanger.Helpers do
   import ExUnit.Assertions
   alias Exchanger.Accounts
   alias Exchanger.Accounts.Wallet
-  alias ExchangerWeb.Schema
+  alias ExchangerWeb.GraphQL.Schema
 
   @incomparables [:inserted_at, :updated_at, :id, :from_user, :from_wallet, :to_user, :to_wallet]
 

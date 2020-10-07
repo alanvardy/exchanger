@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.Transaction do
+defmodule ExchangerWeb.GraphQL.Types.Transaction do
   @moduledoc "Transaction types for Absinthe"
   use Absinthe.Schema.Notation
   import Absinthe.Resolution.Helpers, only: [dataloader: 2]

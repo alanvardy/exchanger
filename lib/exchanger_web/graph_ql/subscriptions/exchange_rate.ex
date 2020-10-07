@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Subscriptions.ExchangeRate do
+defmodule ExchangerWeb.GraphQL.Subscriptions.ExchangeRate do
   @moduledoc "Currency subscriptions for Absinthe"
   use Absinthe.Schema.Notation
 

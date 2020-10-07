@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.Wallet do
+defmodule ExchangerWeb.GraphQL.Types.Wallet do
   @moduledoc "Wallet types for Absinthe"
   use Absinthe.Schema.Notation
   import Absinthe.Resolution.Helpers, only: [dataloader: 2]

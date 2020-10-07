@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.Enums do
+defmodule ExchangerWeb.GraphQL.Types.Enums do
   @moduledoc "Enum types for Absinthe"
   use Absinthe.Schema.Notation
 

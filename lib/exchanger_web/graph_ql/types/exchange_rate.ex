@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.ExchangeRate do
+defmodule ExchangerWeb.GraphQL.Types.ExchangeRate do
   @moduledoc "Exchange rate types for Absinthe"
   use Absinthe.Schema.Notation
 

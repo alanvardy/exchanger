@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.User do
+defmodule ExchangerWeb.GraphQL.Types.User do
   @moduledoc "User types for Absinthe"
   use Absinthe.Schema.Notation
   import Absinthe.Resolution.Helpers, only: [dataloader: 2]

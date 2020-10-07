@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Types.Balance do
+defmodule ExchangerWeb.GraphQL.Types.Balance do
   @moduledoc "User types for Absinthe"
   use Absinthe.Schema.Notation
 

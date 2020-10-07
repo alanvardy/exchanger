@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Queries.Wallet do
+defmodule ExchangerWeb.GraphQL.Queries.Wallet do
   @moduledoc "Absinthe queries for wallets"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :wallet_queries do
     field :wallets, list_of(:wallet) do

@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Mutations.Transaction do
+defmodule ExchangerWeb.GraphQL.Mutations.Transaction do
   @moduledoc "Transaction Mutations for Absinthe"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :transaction_mutations do
     field :create_deposit, :transaction do

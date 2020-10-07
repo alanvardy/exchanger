@@ -2,7 +2,7 @@ defmodule ExchangerWeb.UserSocket do
   use Phoenix.Socket
 
   use Absinthe.Phoenix.Socket,
-    schema: ExchangerWeb.Schema
+    schema: ExchangerWeb.GraphQL.Schema
 
   alias Phoenix.Socket
 

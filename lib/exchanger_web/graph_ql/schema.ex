@@ -1,27 +1,27 @@
-defmodule ExchangerWeb.Schema do
+defmodule ExchangerWeb.GraphQL.Schema do
   @moduledoc "Main schema for Absinthe"
   use Absinthe.Schema
 
   import_types Absinthe.Type.Custom
-  import_types ExchangerWeb.Types.Enums
+  import_types ExchangerWeb.GraphQL.Types.Enums
 
-  import_types ExchangerWeb.Types.Balance
-  import_types ExchangerWeb.Types.ExchangeRate
-  import_types ExchangerWeb.Types.Transaction
-  import_types ExchangerWeb.Types.User
-  import_types ExchangerWeb.Types.Wallet
+  import_types ExchangerWeb.GraphQL.Types.Balance
+  import_types ExchangerWeb.GraphQL.Types.ExchangeRate
+  import_types ExchangerWeb.GraphQL.Types.Transaction
+  import_types ExchangerWeb.GraphQL.Types.User
+  import_types ExchangerWeb.GraphQL.Types.Wallet
 
-  import_types ExchangerWeb.Queries.Balance
-  import_types ExchangerWeb.Queries.Transaction
-  import_types ExchangerWeb.Queries.User
-  import_types ExchangerWeb.Queries.Wallet
+  import_types ExchangerWeb.GraphQL.Queries.Balance
+  import_types ExchangerWeb.GraphQL.Queries.Transaction
+  import_types ExchangerWeb.GraphQL.Queries.User
+  import_types ExchangerWeb.GraphQL.Queries.Wallet
 
-  import_types ExchangerWeb.Mutations.Transaction
-  import_types ExchangerWeb.Mutations.User
-  import_types ExchangerWeb.Mutations.Wallet
+  import_types ExchangerWeb.GraphQL.Mutations.Transaction
+  import_types ExchangerWeb.GraphQL.Mutations.User
+  import_types ExchangerWeb.GraphQL.Mutations.Wallet
 
-  import_types ExchangerWeb.Subscriptions.ExchangeRate
-  import_types ExchangerWeb.Subscriptions.User
+  import_types ExchangerWeb.GraphQL.Subscriptions.ExchangeRate
+  import_types ExchangerWeb.GraphQL.Subscriptions.User
 
   query do
     import_fields :balance_queries

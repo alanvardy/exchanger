@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Resolvers.User do
+defmodule ExchangerWeb.GraphQL.Resolvers.User do
   @moduledoc "User resolvers for Absinthe"
   use Absinthe.Schema.Notation
   alias Exchanger.Accounts

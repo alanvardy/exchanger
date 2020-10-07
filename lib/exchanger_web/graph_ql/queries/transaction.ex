@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Queries.Transaction do
+defmodule ExchangerWeb.GraphQL.Queries.Transaction do
   @moduledoc "Absinthe queries for transactions"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :transaction_queries do
     field :transactions, list_of(:transaction) do

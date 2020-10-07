@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Queries.Balance do
+defmodule ExchangerWeb.GraphQL.Queries.Balance do
   @moduledoc "Absinthe queries for balances"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :balance_queries do
     field :net_worth, :balance do

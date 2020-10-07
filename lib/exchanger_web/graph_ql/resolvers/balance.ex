@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Resolvers.Balance do
+defmodule ExchangerWeb.GraphQL.Resolvers.Balance do
   @moduledoc "Balance resolvers for Absinthe"
   use Absinthe.Schema.Notation
   alias Exchanger.Accounts

@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Queries.User do
+defmodule ExchangerWeb.GraphQL.Queries.User do
   @moduledoc "Absinthe queries for users"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :user_queries do
     field :users, list_of(:user) do

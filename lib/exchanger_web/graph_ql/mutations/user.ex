@@ -1,7 +1,7 @@
-defmodule ExchangerWeb.Mutations.User do
+defmodule ExchangerWeb.GraphQL.Mutations.User do
   @moduledoc "User Mutations for Absinthe"
   use Absinthe.Schema.Notation
-  alias ExchangerWeb.Resolvers
+  alias ExchangerWeb.GraphQL.Resolvers
 
   object :user_mutations do
     field :create_user, :user do

@@ -6,7 +6,7 @@ defmodule ExchangerWeb.SubscriptionCase do
   using do
     quote do
       use ExchangerWeb.ChannelCase
-      use SubscriptionTest, schema: ExchangerWeb.Schema
+      use SubscriptionTest, schema: ExchangerWeb.GraphQL.Schema
       import Exchanger.Factory
 
       setup do

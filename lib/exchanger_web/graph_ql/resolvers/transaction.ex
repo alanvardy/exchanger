@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Resolvers.Transaction do
+defmodule ExchangerWeb.GraphQL.Resolvers.Transaction do
   @moduledoc "Transaction resolvers for Absinthe"
   use Absinthe.Schema.Notation
   alias Exchanger.Accounts

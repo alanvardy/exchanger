@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Subscriptions.User do
+defmodule ExchangerWeb.GraphQL.Subscriptions.User do
   @moduledoc "User subscriptions for Absinthe"
   use Absinthe.Schema.Notation
 

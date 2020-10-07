@@ -36,11 +36,11 @@ defmodule Exchanger.Accounts.User do
   @spec by_id(id) :: Query.t()
   @spec by_id(Queryable.t(), id) :: Query.t()
   def by_id(query \\ __MODULE__, id) do
-    from(q in query, where: q.id == ^id)
+    where(query, [q], q.id == ^id)
   end
 
   @spec with_wallets(Ecto.Queryable.t()) :: Ecto.Query.t()
   def with_wallets(query \\ __MODULE__) do
-    from(q in query, preload: :wallets)
+    preload(query, [q], :wallets)
   end
 end

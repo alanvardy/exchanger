@@ -34,24 +34,24 @@ defmodule Exchanger.Accounts.Wallet do
   @spec where_id(queryable, id) :: Ecto.Query.t()
   @spec where_id(id) :: Ecto.Query.t()
   def where_id(query \\ __MODULE__, id) do
-    from(q in query, where: q.id == ^id)
+    where(query, [q], q.id == ^id)
   end
 
   @spec where_user_id(queryable, id) :: Ecto.Query.t()
   @spec where_user_id(id) :: Ecto.Query.t()
   def where_user_id(query \\ __MODULE__, user_id) do
-    from(q in query, where: q.user_id == ^user_id)
+    where(query, [q], q.user_id == ^user_id)
   end
 
   @spec where_currency(queryable, currency) :: Ecto.Query.t()
   @spec where_currency(currency) :: Ecto.Query.t()
   def where_currency(query \\ __MODULE__, currency) do
-    from(q in query, where: q.currency == ^currency)
+    where(query, [q], q.currency == ^currency)
   end
 
   @spec with_transactions(queryable) :: Ecto.Query.t()
   @spec with_transactions :: Ecto.Query.t()
   def with_transactions(query \\ __MODULE__) do
-    from(q in query, preload: [:sent_transactions, :received_transactions])
+    preload(query, [q], [:sent_transactions, :received_transactions])
   end
 end

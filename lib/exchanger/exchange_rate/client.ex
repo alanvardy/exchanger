@@ -10,7 +10,7 @@ defmodule Exchanger.ExchangeRate.Client do
   @spec get_rate(currency, currency) :: {:error, String.t()} | {:ok, ExchangeRate.t()}
   def get_rate(from_currency, to_currency) do
     with {:ok, rate} <- @client.get_rate(from_currency, to_currency) do
-       convert(rate)
+      convert(rate)
     end
   end
 

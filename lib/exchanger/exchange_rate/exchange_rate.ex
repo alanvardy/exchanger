@@ -1,8 +1,9 @@
 defmodule Exchanger.ExchangeRate.ExchangeRate do
   @moduledoc "Represents an exchange rate at a point in time"
   use TypedStruct
+  alias Exchanger.Accounts.Wallet
 
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
 
   typedstruct do
     @typedoc @moduledoc

@@ -1,9 +1,9 @@
 defmodule Exchanger.ExchangeRate do
   @moduledoc "The ExchangeRate context which holds all knowledge regarding the current exchange rates"
-  alias Exchanger.Accounts.Balance
+  alias Exchanger.Accounts.{Balance, Wallet}
 
   @type response(data) :: {:ok, data} | {:error, :rate_not_found}
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
 
   @spec fetch(currency, currency) :: response(%{rate: float, updated: DateTime.t()})
   defdelegate fetch(from_currency, to_currency), to: Exchanger.ExchangeRate.Store, as: :fetch_rate

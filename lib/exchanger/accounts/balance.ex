@@ -2,7 +2,9 @@ defmodule Exchanger.Accounts.Balance do
   @moduledoc "A wallet or aggregate balance"
   use TypedStruct
 
-  @type currency :: :USD | :GBP | :CAD
+  alias Exchanger.Accounts.Wallet
+
+  @type currency :: Wallet.currency()
 
   typedstruct do
     @typedoc @moduledoc

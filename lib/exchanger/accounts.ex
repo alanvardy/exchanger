@@ -19,7 +19,7 @@ defmodule Exchanger.Accounts do
   @type id :: pos_integer
   @type amount :: pos_integer
   @type exchange_rate :: float
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
   @type params :: keyword | map
 
   @currencies Application.get_env(:exchanger, :currencies)

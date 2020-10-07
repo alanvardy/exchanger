@@ -1,9 +1,10 @@
 defmodule Exchanger.ExchangeRate.Client.Http do
   @moduledoc "For querying the exchange rate api"
   @behaviour Exchanger.ExchangeRate.Client.Behaviour
+  alias Exchanger.Accounts.Wallet
   alias HTTPoison.Response
 
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
 
   @address Application.get_env(:exchanger, :exchange_rate_address)
   @query "/query?function=CURRENCY_EXCHANGE_RATE&from_currency="

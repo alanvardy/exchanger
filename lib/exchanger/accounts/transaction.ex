@@ -10,7 +10,7 @@ defmodule Exchanger.Accounts.Transaction do
 
   @type wallet :: Wallet.t()
   @type changeset :: Ecto.Changeset.t()
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
   @type amount :: pos_integer()
   @type exchange_rate :: float()
 

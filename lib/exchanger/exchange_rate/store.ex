@@ -1,9 +1,10 @@
 defmodule Exchanger.ExchangeRate.Store do
   @moduledoc "Stores exchange rates as a map"
   use Agent
+  alias Exchanger.Accounts.Wallet
   alias Exchanger.ExchangeRate.ExchangeRate
 
-  @type currency :: :USD | :CAD | :GBP
+  @type currency :: Wallet.currency()
   @type rate_response :: {:error, :rate_not_found} | {:ok, %{rate: float, updated: DateTime.t()}}
 
   @spec start_link(any) :: {:error, any} | {:ok, pid}

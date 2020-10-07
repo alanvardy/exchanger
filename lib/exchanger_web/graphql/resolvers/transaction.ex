@@ -5,6 +5,7 @@ defmodule ExchangerWeb.GraphQL.Resolvers.Transaction do
   alias Exchanger.Accounts.Transaction
 
   @type params :: keyword | map
+  @type changeset :: Ecto.Changeset.t()
 
   @spec all(params, any) :: {:ok, [Transaction.t()]} | {:error, binary}
   def all(params, _res) do
@@ -16,21 +17,21 @@ defmodule ExchangerWeb.GraphQL.Resolvers.Transaction do
     Accounts.find_transaction(params)
   end
 
-  @spec create_deposit(params, any) :: {:error, String.t()} | {:ok, Transaction.t()}
+  @spec create_deposit(params, any) :: {:error, changeset} | {:ok, Transaction.t()}
   def create_deposit(params, _res) do
     params
     |> Accounts.create_deposit()
     |> maybe_publish()
   end
 
-  @spec create_withdrawal(params, any) :: {:error, String.t()} | {:ok, Transaction.t()}
+  @spec create_withdrawal(params, any) :: {:error, changeset} | {:ok, Transaction.t()}
   def create_withdrawal(params, _res) do
     params
     |> Accounts.create_withdrawal()
     |> maybe_publish()
   end
 
-  @spec create_transfer(params, any) :: {:error, String.t()} | {:ok, Transaction.t()}
+  @spec create_transfer(params, any) :: {:error, changeset} | {:ok, Transaction.t()}
   def create_transfer(params, _res) do
     params
     |> Accounts.create_transfer()

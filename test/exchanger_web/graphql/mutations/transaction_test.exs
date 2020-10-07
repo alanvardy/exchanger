@@ -54,7 +54,7 @@ defmodule ExchangerWeb.GraphQL.Mutations.TransactionTest do
       user: user,
       wallet: wallet
     } do
-      assert %{errors: [%{message: "to_amount: must be less than or equal to 100000000"}]} =
+      assert %{errors: [%{message: "to_amount: must be less than or equal to %{number}", locations: [%{column: 5, line: 2}], path: ["create_deposit"]}]} =
                run_schema(@create_deposit_doc, %{
                  "to_currency" => "USD",
                  "to_user_id" => user.id,

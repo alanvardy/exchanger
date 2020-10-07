@@ -178,7 +178,6 @@ defmodule Exchanger.Accounts do
       |> Map.merge(%{type: "deposit", to_wallet_id: to_wallet_id})
       |> Transaction.create_deposit_changeset()
       |> Repo.insert()
-      |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
       {:error, _error} -> {:error, "Wallet not found for currency"}
@@ -196,7 +195,6 @@ defmodule Exchanger.Accounts do
       |> Map.merge(%{type: "withdrawal", from_wallet_id: from_wallet_id})
       |> Transaction.create_withdrawal_changeset()
       |> Repo.insert()
-      |> maybe_format_changeset_errors()
     else
       params when is_map(params) -> {:error, "Cannot find wallet, invalid parameters"}
       {:error, _error} -> {:error, "Wallet not found for currency"}
@@ -225,7 +223,6 @@ defmodule Exchanger.Accounts do
       |> Map.put(:from_amount, from_amount)
       |> Transaction.create_transfer_changeset()
       |> Repo.insert()
-      |> maybe_format_changeset_errors()
     else
       false -> {:error, "Insufficient funds"}
       params when is_map(params) -> {:error, "Invalid parameters for transfer"}
@@ -244,25 +241,5 @@ defmodule Exchanger.Accounts do
 
   defp atomize_type({:error, message}) do
     {:error, message}
-  end
-
-  defp maybe_format_changeset_errors({:error, %Changeset{} = changeset}) do
-    errors =
-      changeset
-      |> Changeset.traverse_errors(fn {msg, opts} ->
-        Enum.reduce(opts, msg, fn {key, value}, acc ->
-          String.replace(acc, "%{#{key}}", to_string(value))
-        end)
-      end)
-      |> Enum.reduce("", fn {k, v}, acc ->
-        joined_errors = Enum.join(v, "; ")
-        "#{acc}#{k}: #{joined_errors}"
-      end)
-
-    {:error, errors}
-  end
-
-  defp maybe_format_changeset_errors({:ok, struct}) do
-    {:ok, struct}
   end
 end

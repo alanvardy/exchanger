@@ -50,6 +50,12 @@ defmodule ExchangerWeb.GraphQL.Schema do
     Map.put(ctx, :loader, dataloader)
   end
 
+  def middleware(middleware, _field, %{identifier: :mutation}) do
+    middleware ++ [ExchangerWeb.GraphQL.Middleware.HandleChangesetErrors]
+  end
+
+  def middleware(middleware, _field, _object), do: middleware
+
   @spec plugins :: [atom]
   def plugins do
     [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()

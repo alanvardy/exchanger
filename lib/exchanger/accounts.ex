@@ -1,6 +1,7 @@
 defmodule Exchanger.Accounts do
   @moduledoc """
-  The Accounts context.
+  The main context for business logic in Exchanger, handles the interface around users,
+  their wallets, and the transactions between them.
   """
 
   import Ecto.Query, warn: false

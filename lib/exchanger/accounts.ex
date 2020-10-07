@@ -98,15 +98,21 @@ defmodule Exchanger.Accounts do
   defp aggregate_balances([wallet | tail], currency, sum) do
     {:ok, %Balance{amount: amount}} =
       wallet
-      |> get_wallet_balance()
+      |> get_wallet_balance(false)
       |> ExchangeRate.equivalent_in_currency(currency)
 
     aggregate_balances(tail, currency, sum + amount)
   end
 
   @spec get_wallet_balance(Wallet.t()) :: Balance.t()
-  def get_wallet_balance(%Wallet{id: id}) do
-    # Grab wallet again in case balance has changed
+  @spec get_wallet_balance(Wallet.t(), boolean) :: Balance.t()
+  def get_wallet_balance(wallet, refresh \\ true)
+
+  def get_wallet_balance(%Wallet{currency: currency, balance: balance}, false) do
+    %Balance{amount: balance, currency: currency, timestamp: Timex.now()}
+  end
+
+  def get_wallet_balance(%Wallet{id: id}, true) do
     %Wallet{currency: currency, balance: balance} = get_wallet!(id)
     %Balance{amount: balance, currency: currency, timestamp: Timex.now()}
   end

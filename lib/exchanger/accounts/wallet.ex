@@ -37,6 +37,12 @@ defmodule Exchanger.Accounts.Wallet do
     where(query, [q], q.id == ^id)
   end
 
+  @spec where_ids(queryable, [id]) :: Ecto.Query.t()
+  @spec where_ids([id]) :: Ecto.Query.t()
+  def where_ids(query \\ __MODULE__, ids) do
+    where(query, [q], q.id in ^ids)
+  end
+
   @spec where_user_id(queryable, id) :: Ecto.Query.t()
   @spec where_user_id(id) :: Ecto.Query.t()
   def where_user_id(query \\ __MODULE__, user_id) do

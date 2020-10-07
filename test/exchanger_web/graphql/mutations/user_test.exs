@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Schema.Mutations.UserTest do
+defmodule ExchangerWeb.GraphQL.Mutations.UserTest do
   use Exchanger.DataCase, async: true
   alias Exchanger.Accounts
 

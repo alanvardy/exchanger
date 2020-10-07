@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Schema.Queries.WalletTest do
+defmodule ExchangerWeb.GraphQL.Queries.WalletTest do
   use Exchanger.DataCase, async: true
 
   @wallet_doc """

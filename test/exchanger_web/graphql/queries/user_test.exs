@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Schema.Queries.UserTest do
+defmodule ExchangerWeb.GraphQL.Queries.UserTest do
   use Exchanger.DataCase, async: true
 
   @user_doc """

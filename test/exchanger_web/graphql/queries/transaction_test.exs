@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Schema.Queries.TransactionTest do
+defmodule ExchangerWeb.GraphQL.Queries.TransactionTest do
   use Exchanger.DataCase, async: true
 
   @transaction_doc """

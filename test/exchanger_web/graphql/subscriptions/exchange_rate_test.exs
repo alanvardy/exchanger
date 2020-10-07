@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Subscriptions.ExchangeRateTest do
+defmodule ExchangerWeb.GraphQL.Subscriptions.ExchangeRateTest do
   use ExchangerWeb.SubscriptionCase
 
   @exchange_rate_updated_doc """

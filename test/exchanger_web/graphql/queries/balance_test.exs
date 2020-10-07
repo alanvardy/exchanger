@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Schema.Queries.BalanceTest do
+defmodule ExchangerWeb.GraphQL.Queries.BalanceTest do
   use Exchanger.DataCase, async: true
 
   @net_worth_doc """

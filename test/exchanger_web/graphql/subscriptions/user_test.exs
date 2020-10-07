@@ -1,4 +1,4 @@
-defmodule ExchangerWeb.Subscriptions.UserTest do
+defmodule ExchangerWeb.GraphQL.Subscriptions.UserTest do
   use ExchangerWeb.SubscriptionCase
 
   @net_worth_updated_doc """

@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
+# credo:disable-for-this-file Credo.Check.Refactor.AppendSingleItem
 defmodule ExchangerWeb.GraphQL.Schema do
   @moduledoc "Main schema for Absinthe"
   use Absinthe.Schema

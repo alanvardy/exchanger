@@ -92,12 +92,17 @@ defmodule Exchanger.AccountsTest do
       assert changeset.errors == [to_amount: {"can't be blank", [validation: :required]}]
 
       assert {:error, changeset} =
-        Accounts.create_deposit(%{
-          to_user_id: wallet.user_id,
-          to_currency: wallet.currency,
-          to_amount: 1_000_000_000
-          })
-          assert changeset.errors == [{:to_amount, {"must be less than or equal to %{number}", [validation: :number, kind: :less_than_or_equal_to, number: 100000000]}}]
+               Accounts.create_deposit(%{
+                 to_user_id: wallet.user_id,
+                 to_currency: wallet.currency,
+                 to_amount: 1_000_000_000
+               })
+
+      assert changeset.errors == [
+               {:to_amount,
+                {"must be less than or equal to %{number}",
+                 [validation: :number, kind: :less_than_or_equal_to, number: 100_000_000]}}
+             ]
     end
   end
 
